@@ -4,7 +4,7 @@ require_once ('db.php');
 
 function getSpecificMetrics($service_line_id, $year)
 {
-    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, threshold_direction, is_gateway_metric 
+    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, threshold_direction, is_gateway_metric, is_beta_metric, is_service_line_metric 
 from specific_metrics sm, metrics
 where sm.metric_id=metrics.id AND
 sm.year='.$year.' and service_line_id='.$service_line_id;
@@ -36,7 +36,26 @@ sm.year='.$year.' and service_line_id='.$service_line_id;
 
 function getPerformacesByProvider ($provider_id, $year){
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
-        from performances where provider_id=$provider_id and year=$year group by metric_id, quarter order by metric_id, quarter";
+        from performances 
+        where provider_id=$provider_id and year=$year
+        group by metric_id, quarter order by metric_id, quarter";
+    global $conn;
+    $performances = array();
+    $result = $conn->query($sql);
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $performances[]=$row;
+        }
+        return $performances;
+    }
+    
+}
+
+function getPerformacesByServiceLine ($service_line_id, $year){
+    $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
+        from performances, locations
+        where performances.location_id = locations.id and locations.service_line_id=$service_line_id and year=$year
+        group by metric_id, quarter order by metric_id, quarter";
     global $conn;
     $performances = array();
     $result = $conn->query($sql);

@@ -22,9 +22,8 @@
     $providers = getProvidersByServiceLine($service_line_id);
 
     foreach ($providers as $provider) {
-        $provider_id = $provider['id'];
 
-        $performances = getPerformacesByProvider($provider_id, $year_sel);
+        $performances = getPerformacesByProvider($provider['id'], $year_sel);
     
         $page = 0;
         $i = 0;
