@@ -30,6 +30,7 @@
         $i = 0;
         while ($page < ($metriccount/(2*$metrics_per_row))) {
             echo '
+            <div class="provider">
             <div class="page">
             <div class="row">
                 <div class="logo">
@@ -95,6 +96,7 @@
         <div class="disclaimer">
         CONFIDENTIAL PEER REVIEW DOCUMENT<br>
         This document contains privileged and confidential information for exclusive use in the peer review and quality control functions of the Kettering Health Network and Kettering Physician Network. This information is legally protected by Ohio Revised Code Sections 2305.25, 2305.251 and 2305.252. Further review, dissemination, distribution or copying of this information is strictly prohibited.
+        </div>
         </div>
         </div>
         <?php
