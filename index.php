@@ -16,7 +16,7 @@
 
     $metrics_per_row = 2;
 
-    $specificmetrics = getSpecificMetrics($service_line_id, $year_sel);
+    $specificmetrics = getSpecificMetrics($service_line_id, $year_sel, TRUE);
     $metriccount = count($specificmetrics);
 
     $providers = getProvidersByServiceLine($service_line_id);

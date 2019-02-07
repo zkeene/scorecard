@@ -2,12 +2,18 @@
 
 require_once ('db.php');
 
-function getSpecificMetrics($service_line_id, $year)
+function getSpecificMetrics($service_line_id, $year, $provider_level)
 {
-    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, threshold_direction, is_gateway_metric, is_beta_metric, is_service_line_metric 
-from specific_metrics sm, metrics
-where sm.metric_id=metrics.id AND
-sm.year='.$year.' and service_line_id='.$service_line_id;
+    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, threshold_direction, is_gateway_metric, is_beta_metric 
+    from specific_metrics sm, metrics
+    where sm.metric_id=metrics.id AND ';
+
+    if($provider_level) {
+        $sql .= 'sm.is_service_line_metric=0 AND ';
+    } 
+
+    $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id;
+
     global $conn;
     $result = $conn->query($sql);
     $specmet_array = array();
