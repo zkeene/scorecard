@@ -1,6 +1,6 @@
 <?php
 
-require_once ('db.php');
+require_once('db.php');
 
 function getSpecificMetrics($service_line_id, $year, $provider_level)
 {
@@ -8,9 +8,9 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     from specific_metrics sm, metrics
     where sm.metric_id=metrics.id AND ';
 
-    if($provider_level) {
+    if ($provider_level) {
         $sql .= 'sm.is_service_line_metric=0 AND ';
-    } 
+    }
 
     $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id;
 
@@ -40,7 +40,8 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     return $specmet_array;
 }
 
-function getPerformacesByProvider ($provider_id, $year){
+function getPerformacesByProvider($provider_id, $year)
+{
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
         from performances 
         where provider_id=$provider_id and year=$year
@@ -54,10 +55,10 @@ function getPerformacesByProvider ($provider_id, $year){
         }
         return $performances;
     }
-    
 }
 
-function getPerformacesByServiceLine ($service_line_id, $year){
+function getPerformacesByServiceLine($service_line_id, $year)
+{
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
         from performances, locations
         where performances.location_id = locations.id and locations.service_line_id=$service_line_id and year=$year
@@ -71,10 +72,10 @@ function getPerformacesByServiceLine ($service_line_id, $year){
         }
         return $performances;
     }
-    
 }
 
-function getServiceLineName ($service_line_id){
+function getServiceLineName($service_line_id)
+{
     $sql = "select service_line from service_lines where id=$service_line_id";
     global $conn;
     $result = $conn->query($sql);
@@ -84,10 +85,10 @@ function getServiceLineName ($service_line_id){
         }
         return $service_line;
     }
-    
 }
 
-function getServiceLines () {
+function getServiceLines()
+{
     $sql = "select id, service_line from service_lines";
     global $conn;
     $result = $conn->query($sql);
@@ -99,21 +100,23 @@ function getServiceLines () {
     }
 }
 
-function getYears () {
+function getYears()
+{
     $sql = "select distinct year from specific_metrics";
     global $conn;
     $result = $conn->query($sql);
     if ($result) {
         while ($row = $result->fetch_assoc()) {
-            $years[]=$row['year'];
+            $years[] = $row['year'];
         }
         return $years;
     }
 }
 
-function getCorrectThresholdValue ($valarr, $performance, $direction){
-    $thresholds = array_keys ($valarr);
-    if ($direction==0) {
+function getCorrectThresholdValue($valarr, $performance, $direction)
+{
+    $thresholds = array_keys($valarr);
+    if ($direction == 0) {
         $thresholds1 = array_filter(
         $thresholds,
         function ($n) use ($performance) {
@@ -121,7 +124,7 @@ function getCorrectThresholdValue ($valarr, $performance, $direction){
         }
         );
         return $valarr[max($thresholds1)];
-    } elseif ($direction==1){
+    } elseif ($direction == 1) {
         $thresholds1 = array_filter(
             $thresholds,
             function ($n) use ($performance) {
@@ -134,7 +137,8 @@ function getCorrectThresholdValue ($valarr, $performance, $direction){
     }
 }
 
-function getProvidersByServiceLine ($service_line_id) {
+function getProvidersByServiceLine($service_line_id)
+{
     $sql = "select id, provider_name from providers where service_line_id=$service_line_id";
     global $conn;
     $result = $conn->query($sql);
@@ -144,4 +148,25 @@ function getProvidersByServiceLine ($service_line_id) {
         }
         return $providers;
     }
+}
+
+function getContract($provider_id)
+{
+    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date 
+        FROM contracts 
+        WHERE active=1 AND provider_id=$provider_id";
+    global $conn;
+    $result = $conn->query($sql);
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $contract['incentive'] = $row['total_incentive_amount'];
+            $contract['effective'] = $row['effective_quality_date'];
+            $contract['default_expire'] = $row['default_expire_date'];
+        }
+        return $contract;
+    }
+}
+
+function curr_format($amount) {
+    return '$'.number_format($amount, 0);
 }

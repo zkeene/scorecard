@@ -18,6 +18,7 @@
 
     $specificmetrics = getSpecificMetrics($service_line_id, $year_sel, TRUE);
     $metriccount = count($specificmetrics);
+    $incentive_metric_count = count(array_filter($specificmetrics, function ($d) {return !$d['is_beta_metric'];}));
 
     $providers = getProvidersByServiceLine($service_line_id);
 
@@ -75,6 +76,8 @@
                     echo "</div>\n";
                 
                     include('constructors/metric_table.php');
+
+                    include('constructors/compensation.php');
 
                     echo '<div class="metric_def">';
                     echo $specificmetrics[$i]['metric_def'];
