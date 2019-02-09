@@ -25,6 +25,14 @@
                         echo '<td></td>';
                 }
             }
+            echo '</tr><tr>';
+            for ($j=1; $j < 5; $j++) {
+                if ($j<count($metric_perf)+1) {
+                        echo '<td>'.curr_format($inc_array[$j]).' ('.number_format($percent_incentive[$j],0).'%)</td>';
+                } else {
+                        echo '<td></td>';
+                }
+            }
         ?>
         </tr>
     </table>

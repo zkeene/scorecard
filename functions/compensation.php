@@ -1,4 +1,3 @@
-<div class="compensation">
     <?php
     $contract = getContract($provider['id']);
 
@@ -40,17 +39,3 @@
         $contract_status = 'not_full';
     }
     ?>
-    <table class="metric_table"><tr><td>Q1</td><td>Q2</td><td>Q3</td><td>Q4</td></tr>
-        <tr>
-        <?php
-            for ($j=1; $j < 5; $j++) {
-                if ($j<count($metric_perf)+1) {
-                        echo '<td>'.$perfarr[$j-1].'% - '.curr_format($inc_array[$j]).' ('.$percent_incentive[$j].'%)</td>';
-                } else {
-                        echo '<td></td>';
-                }
-            }
-        ?>
-        </tr>
-    </table>
-</div>

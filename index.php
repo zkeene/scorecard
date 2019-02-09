@@ -75,9 +75,9 @@
                 
                     echo "</div>\n";
                 
-                    include('constructors/metric_table.php');
+                    include('functions/compensation.php');
 
-                    include('constructors/compensation.php');
+                    include('constructors/metric_table.php');
 
                     echo '<div class="metric_def">';
                     echo $specificmetrics[$i]['metric_def'];
