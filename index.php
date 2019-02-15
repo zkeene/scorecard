@@ -24,6 +24,7 @@
 
     foreach ($providers as $provider) {
 
+        $contract = getContract($provider['id']);
         $performances = getPerformacesByProvider($provider['id'], $year_sel);
     
         $page = 0;

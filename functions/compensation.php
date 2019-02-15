@@ -1,5 +1,4 @@
     <?php
-    $contract = getContract($provider['id']);
 
     //determine single quarter incentive
     if ($contract['incentive']) {
