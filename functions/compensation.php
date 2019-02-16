@@ -27,8 +27,8 @@
     } elseif (($contract['effective'] <= $year_start) && (($contract['default_expire'] >= $year_end) || (is_null($contract['default_expire'])))) {
         $contract_status = 'full_default';
         for ($m=1; $m < 5; $m++) {
-            $percent_incentive = 100;
-            $inc_array[$m] = $qtr_incentive;
+            $percent_incentive[$m] = 100;
+            $inc_array[$m] = $qtr_incentive/$incentive_metric_count;
         }
     //full ineligible (zero): effective date is after year end OR effective date doesn't exist
     } elseif (($contract['effective'] > $year_end) || (is_null($contract['effective']))) {
@@ -36,5 +36,8 @@
     //not full year: will evaluate each quarter and each time period in quarter (first eval quarter to apply full logic if applicable)
     } else {
         $contract_status = 'not_full';
+        //will need to loop through each quater and do the same assessment as above but compare to quarter start and end
+        // then for the not_full quarters we will need to calculate the percents of the quarter for each status which
+        // then will need to be multiplied into the inc_array
     }
     ?>

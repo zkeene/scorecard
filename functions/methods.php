@@ -170,3 +170,7 @@ function getContract($provider_id)
 function curr_format($amount) {
     return '$'.number_format($amount, 0);
 }
+
+function getQuarterFromDate ($date_to_check) {
+    return ceil(date('n', strtotime($date_to_check))/ 3);
+}
