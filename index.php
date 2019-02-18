@@ -25,6 +25,14 @@
     foreach ($providers as $provider) {
 
         $contract = getContract($provider['id']);
+        if ($contract['incentive']) {
+            $qtr_incentive = $contract['incentive']/4;
+        } else {
+            $qtr_incentive = 0;
+        }
+        $qtr_incentive_per_metric = $qtr_incentive/$incentive_metric_count;
+        $quarter_status = getContractStatusArray($contract['effective'],$contract['default_expire'],$year_sel);
+
         $performances = getPerformacesByProvider($provider['id'], $year_sel);
     
         $page = 0;
@@ -76,7 +84,26 @@
                 
                     echo "</div>\n";
                 
-                    include('functions/compensation.php');
+                    //comp info array population
+                    $inc_array = array_fill(1, 4, null);
+                    $percent_incentive = array_fill(1, 4, null);
+                    $thresh_percent_arr = array_column($specificmetrics[$i]['thresholds'], 'threshold_incentive_percent', 'threshold');
+                
+                    for ($m=1; $m < 5; $m++) {
+                        if ($quarter_status[$m]=='eligible') {
+                            if ($m<count($metric_perf)+1) {
+                                $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m-1], $specificmetrics[$i]['threshold_direction']);
+                                $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                            }
+                        } elseif ($quarter_status[$m]=='default') {
+                            $percent_incentive[$m] = 100;
+                            $inc_array[$m] = $qtr_incentive_per_metric;
+                        } elseif ($quarter_status[$m]=='ineligible') {
+                            $percent_incentive[$m]=0;
+                        } elseif ($quarter_status[$m]=='partial') {
+                            //figure out what to do here
+                        }
+                    }
 
                     include('constructors/metric_table.php');
 

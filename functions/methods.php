@@ -174,3 +174,42 @@ function curr_format($amount) {
 function getQuarterFromDate ($date_to_check) {
     return ceil(date('n', strtotime($date_to_check))/ 3);
 }
+
+function getContractStatusArray ($effective, $default_expire, $year_sel) {
+    $year_start = $year_sel.'-1-1';
+    $year_end = $year_sel.'-12-31';
+    $quarter_start = array(1=>$year_sel.'1-1',2=>$year_sel.'4-1',3=>$year_sel.'7-1',4=>$year_sel.'10-1');
+    $quarter_end = array(1=>$year_sel.'3-31',2=>$year_sel.'6-30',3=>$year_sel.'11-30',4=>$year_sel.'12-31');
+    $quarter_status = array_fill(1, 4, null);
+
+    //full eligbile (performance based): effective date at beginning of year or prior AND default expired prior to beginning of year
+    if (($effective <= $year_start) && ($default_expire < $year_start)) {
+        for ($m=1; $m < 5; $m++) {
+            $quarter_status[$m] = 'eligible';
+        }
+        //full default (max possible): effective date at beginning of year or prior AND (default expires after year end OR no default expiration)
+    } elseif (($effective <= $year_start) && (($default_expire >= $year_end) || (is_null($default_expire)))) {
+        for ($m=1; $m < 5; $m++) {
+            $quarter_status[$m] = 'default';
+        }
+        //full ineligible (zero): effective date is after year end OR effective date doesn't exist
+    } elseif (($effective > $year_end) || (is_null($effective))) {
+        for ($m=1; $m < 5; $m++) {
+            $quarter_status[$m] = 'ineligible';
+        }
+        //not full year: will evaluate each quarter and each time period in quarter (first eval quarter to apply full logic if applicable)
+    } else {
+        for ($m=1; $m < 5; $m++) {
+            if (($effective <= $quarter_start[$m]) && ($default_expire < $quarter_start[$m])) {
+                $quarter_status[$m] = 'eligible';
+            } elseif (($effective <= $quarter_start[$m]) && (($default_expire >= $quarter_end[$m]) || (is_null($default_expire)))) {
+                $quarter_status[$m] = 'default';
+            } elseif (($effective > $quarter_end[$m]) || (is_null($effective))) {
+                $quarter_status[$m] = 'ineligible';
+            } else {
+                $quarter_status[$m] = 'partial';
+            }
+        }
+    }
+    return $quarter_status;
+}
