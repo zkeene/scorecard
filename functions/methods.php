@@ -175,11 +175,13 @@ function getQuarterFromDate ($date_to_check) {
     return ceil(date('n', strtotime($date_to_check))/ 3);
 }
 
-function getContractStatusArray ($effective, $default_expire, $year_sel) {
-    $year_start = $year_sel.'-1-1';
-    $year_end = $year_sel.'-12-31';
-    $quarter_start = array(1=>$year_sel.'1-1',2=>$year_sel.'4-1',3=>$year_sel.'7-1',4=>$year_sel.'10-1');
-    $quarter_end = array(1=>$year_sel.'3-31',2=>$year_sel.'6-30',3=>$year_sel.'11-30',4=>$year_sel.'12-31');
+function getContractStatusArray ($effective_str, $default_expire_str, $year_sel) {
+    $effective = strtotime($effective_str);
+    $default_expire = strtotime($default_expire_str);
+    $year_start = strtotime($year_sel.'-1-1');
+    $year_end = strtotime($year_sel.'-12-31');
+    $quarter_start = array(1=>strtotime($year_sel.'-1-1'),2=>strtotime($year_sel.'-4-1'),3=>strtotime($year_sel.'-7-1'),4=>strtotime($year_sel.'-10-1'));
+    $quarter_end = array(1=>strtotime($year_sel.'-3-31'),2=>strtotime($year_sel.'-6-30'),3=>strtotime($year_sel.'-11-30'),4=>strtotime($year_sel.'-12-31'));
     $quarter_status = array_fill(1, 4, null);
 
     //full eligbile (performance based): effective date at beginning of year or prior AND default expired prior to beginning of year
