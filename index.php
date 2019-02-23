@@ -101,7 +101,9 @@
                         } elseif ($quarter_status[$m]=='ineligible') {
                             $percent_incentive[$m]=0;
                         } elseif ($quarter_status[$m]=='partial') {
-                            //figure out what to do here
+                            $partial_qtr_percent = getPartialQuarterPercent($m,$contract['effective'],$contract['default_expire'],$year_sel);
+                            $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m-1], $specificmetrics[$i]['threshold_direction']));
+                            $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
                         }
                     }
 
