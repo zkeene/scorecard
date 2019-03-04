@@ -36,15 +36,15 @@ function createGraph($p, $d, $c)
         $xcoord = ($i*$barwidth)+($i*$spacewidth)+($spacewidth/2);
         $scaledvalue = scaleValue($val,$barheight,$minv,$maxv);
         echo '<rect width="'.$barwidth.'" height="'.$scaledvalue.'" x="'.$xcoord.'" y="'.($barheight-$scaledvalue).'" style="fill:'.$perf_color.'"/>';
-        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="10">'.$val.'</text>';
-        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-5).'" font-size="10">Q'.($i+1).'</text>';
+        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="10" font-weight="bold">'.$val.'</text>';
+        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-4).'" font-size="10" font-weight="bold">Q'.($i+1).'</text>';
         $i++;
     }
 
     foreach ($thresharr as $thresh) {
         $ypos = $barheight-scaleValue($thresh[0],$barheight,$minv,$maxv);
-        echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:1"/>';
-        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="10" fill="'.$thresh[1].'">'.$thresh[0].'</text>';
+        echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:2"/>';
+        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="10" font-weight="bold" fill="'.$thresh[1].'">'.$thresh[0].'</text>';
     }
 
     echo '</svg>';
