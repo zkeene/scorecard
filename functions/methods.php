@@ -9,7 +9,7 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     where sm.metric_id=metrics.id AND ';
 
     if ($provider_level) {
-        $sql .= 'sm.is_service_line_metric=0 AND ';
+        $sql .= 'sm.is_location_metric=0 AND ';
     }
 
     $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id;
@@ -252,4 +252,34 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
 
     $partial_qtr_percent = array('default'=>($default_days/$days_in_quarter*100),'eligible'=>($eligible_days/$days_in_quarter*100));
     return $partial_qtr_percent;
+}
+
+function getGatewayStatus ($specificmetrics, $performances) {
+    $gateway_status = array_fill(1,4,1);
+    $gateway_key = array_search(1,array_column($specificmetrics,'is_gateway_metric'));
+    if ($gateway_key!="") {
+        $gateway_metric_id = $specificmetrics[$gateway_key]['metric_id'];
+        $gateway_threshold_key = array_search(1, array_column($specificmetrics[$gateway_key]['thresholds'], 'is_gateway_threshold', 'id'));
+        $gateway_threshold = $specificmetrics[$gateway_key]['thresholds'][$gateway_threshold_key]['threshold'];
+        $gateway_down = $specificmetrics[$gateway_key]['threshold_direction'];
+
+        $perf_keys = array_keys(array_column($performances, 'metric_id'), $gateway_metric_id);
+
+        $perf_arr = array();
+
+        foreach ($perf_keys as $perf_key) {
+            $performance = $performances[$perf_key]['numerator']/$performances[$perf_key]['denominator']*100;
+            if ($gateway_down) {
+                if ($performance >= $gateway_threshold) {
+                    $gateway_status[$performances[$perf_key]['quarter']] = 0;
+                }
+            } else {
+                if ($performance <= $gateway_threshold) {
+                    $gateway_status[$performances[$perf_key]['quarter']] = 0;
+                }
+            }
+        }
+    }
+    print_r($gateway_status);
+    return $gateway_status;    
 }

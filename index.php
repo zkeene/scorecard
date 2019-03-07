@@ -34,7 +34,15 @@
         $quarter_status = getContractStatusArray($contract['effective'],$contract['default_expire'],$year_sel);
 
         $performances = getPerformacesByProvider($provider['id'], $year_sel);
-    
+        
+        $gateway_status = getGatewayStatus($specificmetrics, $performances);
+
+        foreach($quarter_status as $qtr => $qtr_status) {
+            if ($gateway_status[$qtr]==0) {
+                $quarter_status[$qtr] = 'ineligible';
+            }
+        }
+
         $page = 0;
         $i = 0;
         while ($page < ($metriccount/(2*$metrics_per_row))) {
