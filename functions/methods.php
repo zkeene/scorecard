@@ -280,6 +280,5 @@ function getGatewayStatus ($specificmetrics, $performances) {
             }
         }
     }
-    print_r($gateway_status);
     return $gateway_status;    
 }
