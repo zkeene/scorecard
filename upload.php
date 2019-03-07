@@ -9,6 +9,9 @@ if ($_FILES) {
         $prov_type = 'NPI';
     }
     $filepath = $_FILES['userfile']['tmp_name'];
+    if (strtoupper(substr(PHP_OS,0,3)) == 'WIN') {
+        $filepath = str_replace('\\', '/', $_FILES['userfile']['tmp_name']);
+    }
 
     $sql = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
     ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' '.
