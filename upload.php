@@ -16,13 +16,14 @@ if ($_FILES) {
     $sql = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
     ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' '.
     '(@var1, numerator, denominator) '.
-    'SET provider_id = (select id from providers where '.$prov_type.'=@var1)'.
+    'SET provider_id = (IFNULL((select id from providers where '.$prov_type.'=@var1), NULL))'.
+    ',import_error = (IF((select id from providers where '.$prov_type.'=@var1), NULL, @var1))'.
     ',year = '.$_POST['year_sel'].
     ',quarter = '.$_POST['quarter'].
     ',metric_id = '.$_POST['metric'];
 
     if ($conn->query($sql)) {
-        echo "Success";
+        echo 'Success <a href=upload_errors.php>Errors</a>';
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
