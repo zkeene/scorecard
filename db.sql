@@ -2,7 +2,7 @@
 -- Host:                         kpnquality.local
 -- Server version:               10.3.11-MariaDB-1:10.3.11+maria~bionic - mariadb.org binary distribution
 -- Server OS:                    debian-linux-gnu
--- HeidiSQL Version:             10.1.0.5464
+-- HeidiSQL Version:             10.1.0.5481
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `contracts` (
 CREATE TABLE IF NOT EXISTS `locations` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `location_name` varchar(50) NOT NULL,
+  `service_line_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
@@ -78,13 +79,14 @@ CREATE TABLE IF NOT EXISTS `pay_cycles` (
 -- Dumping structure for table kpnquality.performances
 CREATE TABLE IF NOT EXISTS `performances` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `provider_id` int(11) unsigned NOT NULL,
-  `location_id` int(11) unsigned NOT NULL,
+  `provider_id` int(11) unsigned DEFAULT NULL,
+  `location_id` int(11) unsigned DEFAULT NULL,
   `metric_id` int(11) unsigned NOT NULL,
   `numerator` int(11) unsigned NOT NULL,
   `denominator` int(11) unsigned NOT NULL,
   `quarter` int(1) unsigned NOT NULL,
   `year` year(4) NOT NULL,
+  `import_error` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `provider_id` (`provider_id`),
   KEY `location_id` (`location_id`),
@@ -92,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `performances` (
   CONSTRAINT `performances_ibfk_1` FOREIGN KEY (`provider_id`) REFERENCES `providers` (`id`),
   CONSTRAINT `performances_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`),
   CONSTRAINT `performances_ibfk_3` FOREIGN KEY (`metric_id`) REFERENCES `metrics` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
 
 -- Data exporting was unselected.
 -- Dumping structure for table kpnquality.providers

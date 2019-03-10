@@ -9,7 +9,7 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     where sm.metric_id=metrics.id AND ';
 
     if ($provider_level) {
-        $sql .= 'sm.is_location_metric=0 AND ';
+        $sql .= 'sm.is_service_line_metric=0 AND ';
     }
 
     $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id;
