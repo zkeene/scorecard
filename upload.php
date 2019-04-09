@@ -14,7 +14,7 @@ if ($_FILES) {
     }
 
     $sql = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
-    ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' '.
+    ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' LINES TERMINATED BY \'\\r\\n\''.
     '(@var1, numerator, denominator) '.
     'SET provider_id = (IFNULL((select id from providers where '.$prov_type.'=@var1), NULL))'.
     ',import_error = (IF((select id from providers where '.$prov_type.'=@var1), NULL, @var1))'.
