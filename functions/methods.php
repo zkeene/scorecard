@@ -12,7 +12,7 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
         $sql .= 'sm.is_service_line_metric=0 AND ';
     }
 
-    $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id;
+    $sql .= 'sm.year='.$year.' and service_line_id='.$service_line_id.' order by metric_order';
 
     global $conn;
     $result = $conn->query($sql);
