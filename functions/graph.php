@@ -20,31 +20,38 @@ function createGraph($p, $d, $c)
     $width = 280;
     $height = 200;
     $fontsize = 10;
+    $barpercent = .7;
+    $topmargin = 15;
+
     $valarray = array_merge($p,array_map('array_shift',$thresharr));
     $maxv = max($valarray);
     $minv = min($valarray);
+
+    $barheight = $height-$topmargin;
+
+    $spacepercent = (1-$barpercent)/4;
+    //$width -15 to give space for the threshold box
+    $barwidth = ($width-15)*($barpercent/4);
+    $spacewidth = ($width-15)*$spacepercent;
+
     echo '<svg width="'.$width.'" height="'.$height.'">';
-    $barheight = $height-15;
-    $barpercent = .7;
-    $spacepercent = (1-$barpercent)/3;
-    $barwidth = $width*($barpercent/4);
-    $spacewidth = $width*$spacepercent;
-    echo '<line x1="0" x2="'.$width.'" y1="'.($height-14).'" y2="'.($height-14).'" style="stroke:black;stroke-width:2"/>';
+    echo '<line x1="0" x2="'.$width.'" y1="'.($barheight+1).'" y2="'.($barheight+1).'" style="stroke:black;stroke-width:2"/>';
     $i = 0;
     foreach ($p as $val) {
         $perf_color = getCorrectThresholdValue($c, $val, $d);
-        $xcoord = ($i*$barwidth)+($i*$spacewidth)+($spacewidth/2);
+        $xcoord = ($i*$barwidth)+($i*$spacewidth)+($spacewidth/3);
         $scaledvalue = scaleValue($val,$barheight,$minv,$maxv);
         echo '<rect width="'.$barwidth.'" height="'.$scaledvalue.'" x="'.$xcoord.'" y="'.($barheight-$scaledvalue).'" style="fill:'.$perf_color.'"/>';
-        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="10" font-weight="bold">'.$val.'</text>';
-        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-4).'" font-size="10" font-weight="bold">Q'.($i+1).'</text>';
+        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="'.$fontsize.'" font-weight="bold">'.$val.'</text>';
+        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-4).'" font-size="'.$fontsize.'" font-weight="bold">Q'.($i+1).'</text>';
         $i++;
     }
 
     foreach ($thresharr as $thresh) {
         $ypos = $barheight-scaleValue($thresh[0],$barheight,$minv,$maxv);
         echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:2"/>';
-        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="10" font-weight="bold" fill="'.$thresh[1].'">'.$thresh[0].'</text>';
+        echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="fill:'.$thresh[1].'"/>';
+        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="'.$fontsize.'" font-weight="bold" fill="#000000">'.$thresh[0].'</text>';
     }
 
     echo '</svg>';

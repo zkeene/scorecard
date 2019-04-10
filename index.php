@@ -117,14 +117,14 @@
 
                     include('constructors/metric_table.php');
 
-                    echo '<div class="metric_def">';
-                    echo $specificmetrics[$i]['metric_def'];
-                    echo "</div>\n";
-
                     echo '<div class="metric_message">';
                     $messages = array_column($specificmetrics[$i]['thresholds'], 'message', 'threshold');
                     echo getCorrectThresholdValue($messages, $metric_perf[count($metric_perf)]['performance'], $specificmetrics[$i]['threshold_direction']);
-                    echo "</div>";
+                    echo "</div>\n";
+
+                    echo '<div class="metric_def">';
+                    echo $specificmetrics[$i]['metric_def'];
+                    echo "</div>\n";
 
                     echo "</div>\n";
                     $i++;

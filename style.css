@@ -50,6 +50,10 @@ body {
     text-align: center;
     font-size: 10pt;
 }
+.metric_title{
+    text-align: center;
+    font-size: 14pt;
+}
 .metric_table {
     margin: 2px;
 }
@@ -64,7 +68,7 @@ body {
 .metric_graph{
     float: left;
 }
-.metric_message{
+.metric_def{
     float:left;
     width: 100%;
 }
