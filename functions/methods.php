@@ -4,7 +4,7 @@ require_once('db.php');
 
 function getSpecificMetrics($service_line_id, $year, $provider_level)
 {
-    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, threshold_direction, is_gateway_metric, is_beta_metric 
+    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, is_calculated_metric, threshold_direction, is_gateway_metric, is_beta_metric 
     from specific_metrics sm, metrics
     where sm.metric_id=metrics.id AND ';
 
@@ -40,7 +40,7 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     return $specmet_array;
 }
 
-function getPerformacesByProvider($provider_id, $year)
+function getPerformancesByProvider($provider_id, $year)
 {
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
         from performances 
@@ -268,7 +268,11 @@ function getGatewayStatus ($specificmetrics, $performances) {
         $perf_arr = array();
 
         foreach ($perf_keys as $perf_key) {
-            $performance = $performances[$perf_key]['numerator']/$performances[$perf_key]['denominator']*100;
+            if($specificmetrics[$gateway_key]['is_calculated_metric']){
+                $performance = $performances[$perf_key]['numerator'];
+            } else {
+                $performance = $performances[$perf_key]['numerator']/$performances[$perf_key]['denominator']*100;
+            }
             if ($gateway_down) {
                 if ($performance >= $gateway_threshold) {
                     $gateway_status[$performances[$perf_key]['quarter']] = 0;

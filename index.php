@@ -33,7 +33,7 @@
         $qtr_incentive_per_metric = $qtr_incentive/$incentive_metric_count;
         $quarter_status = getContractStatusArray($contract['effective'],$contract['default_expire'],$year_sel);
 
-        $performances = getPerformacesByProvider($provider['id'], $year_sel);
+        $performances = getPerformancesByProvider($provider['id'], $year_sel);
         
         $gateway_status = getGatewayStatus($specificmetrics, $performances);
 
@@ -78,9 +78,13 @@
                     foreach ($perfkeys as $key) {
                         $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
                         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
-                        $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, 1);
+                        if ($specificmetrics[$i]['is_calculated_metric']) {
+                            $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], 1);
+                        } else {
+                            $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, 1);
+                        }
                     }
-
+                    
                     //color array
                     $colors = array_column($specificmetrics[$i]['thresholds'], 'color_hex', 'threshold');
                     //perf array to pass to create graph

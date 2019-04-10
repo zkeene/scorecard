@@ -2,21 +2,33 @@
     <table class="metric_table"><tr><td>Q1</td><td>Q2</td><td>Q3</td><td>Q4</td></tr>
         <tr>
         <?php
+        if ($specificmetrics[$i]['is_calculated_metric']) {
             for ($j=1; $j <5; $j++) {
                 if ($j<count($metric_perf)+1) {
-                        echo '<td>'.$metric_perf[$j]['performance'].'% ('.$metric_perf[$j]['numerator'].'/'.$metric_perf[$j]['denominator'].')</td>';
+                    echo '<td>'.$metric_perf[$j]['performance'].'</td>';
                 } else {
-                        echo '<td></td>';
+                    echo '<td></td>';
                 }
             }
+        } else {
+            for ($j=1; $j <5; $j++) {
+                if ($j<count($metric_perf)+1) {
+                    echo '<td>'.$metric_perf[$j]['performance'].'% ('.$metric_perf[$j]['numerator'].'/'.$metric_perf[$j]['denominator'].')</td>';
+                } else {
+                    echo '<td></td>';
+                }
+            }
+        }
+        if ($contract['incentive']) {
             echo '</tr><tr>';
             for ($j=1; $j < 5; $j++) {
                 if ($j<count($metric_perf)+1) {
-                        echo '<td>'.curr_format($inc_array[$j]).' ('.number_format($percent_incentive[$j],0).'%)</td>';
+                    echo '<td>'.curr_format($inc_array[$j]).' ('.number_format($percent_incentive[$j], 0).'%)</td>';
                 } else {
-                        echo '<td></td>';
+                    echo '<td></td>';
                 }
             }
+        }
         ?>
         </tr>
     </table>

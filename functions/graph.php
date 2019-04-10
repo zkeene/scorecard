@@ -50,7 +50,7 @@ function createGraph($p, $d, $c)
     foreach ($thresharr as $thresh) {
         $ypos = $barheight-scaleValue($thresh[0],$barheight,$minv,$maxv);
         echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:2"/>';
-        echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="fill:'.$thresh[1].'"/>';
+        echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="stroke:#000000; stroke-width:1; fill:none;"/>';
         echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="'.$fontsize.'" font-weight="bold" fill="#000000">'.$thresh[0].'</text>';
     }
 
