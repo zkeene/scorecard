@@ -19,7 +19,7 @@
                 }
             }
         }
-        if ($contract['incentive']) {
+        if ($contract['incentive'] != 0) {
             echo '</tr><tr>';
             for ($j=1; $j < 5; $j++) {
                 if ($j<count($metric_perf)+1) {
