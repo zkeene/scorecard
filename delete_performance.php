@@ -6,7 +6,8 @@ if ($_POST) {
     if ($_POST['confirm']) {
         $metric_id = $_POST['metric_id'];
         $year = $_POST['year'];
-        $sql = "delete from performances where metric_id=$metric_id and year=$year";
+        $quarter = $_POST['quarter'];
+        $sql = "delete from performances where metric_id=$metric_id and year=$year and quarter=$quarter";
 
         if ($conn->query($sql)) {
             echo 'Successfully deleted performance data';
@@ -39,7 +40,13 @@ if ($_POST) {
     ?>
     </select><br/>
     Year: <input type="text" name="year" size="4" /><br/>
-    Are you sure you want to delete all performance data for this metric in this year?:
+    Quarter: <select name="quarter">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select><br/>
+    Are you sure you want to delete all performance data for this metric in the selected period?:
     <select name="confirm">
         <option value="0" default>No</option>
         <option value="1">Yes</option>
