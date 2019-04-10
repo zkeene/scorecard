@@ -13,7 +13,26 @@ if ($_FILES) {
         $filepath = str_replace('\\', '/', $_FILES['userfile']['tmp_name']);
     }
 
-    $sql = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
+    $metric = $_POST['metric'];
+    $sql_metric = "select is_calculated_metric from metrics where id=$metric";
+    $result_metric = $conn->query($sql_metric);
+    if ($result_metric) {
+        while ($row = $result_metric->fetch_assoc()) {
+            $calculated = $row['is_calculated_metric'];
+        }
+    }
+
+    if($calculated){
+        $sql_load = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
+        ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' LINES TERMINATED BY \'\\r\\n\''.
+        '(@var1, numerator) '.
+        'SET provider_id = (IFNULL((select id from providers where '.$prov_type.'=@var1), NULL))'.
+        ',import_error = (IF((select id from providers where '.$prov_type.'=@var1), NULL, @var1))'.
+        ',year = '.$_POST['year_sel'].
+        ',quarter = '.$_POST['quarter'].
+        ',metric_id = '.$_POST['metric'];
+    } else {
+        $sql_load = "LOAD DATA LOCAL INFILE '$filepath' into table performances".
     ' FIELDS TERMINATED BY \',\' OPTIONALLY ENCLOSED BY \'"\' LINES TERMINATED BY \'\\r\\n\''.
     '(@var1, numerator, denominator) '.
     'SET provider_id = (IFNULL((select id from providers where '.$prov_type.'=@var1), NULL))'.
@@ -21,12 +40,14 @@ if ($_FILES) {
     ',year = '.$_POST['year_sel'].
     ',quarter = '.$_POST['quarter'].
     ',metric_id = '.$_POST['metric'];
+    }
 
-    if ($conn->query($sql)) {
+    if ($conn->query($sql_load)) {
         echo 'Success <a href=upload_errors.php>Errors</a>';
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        echo "Error: " . $sql_load . "<br>" . $conn->error;
     }
+    
 }
 ?>
 <!DOCTYPE html>
