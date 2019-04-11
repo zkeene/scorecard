@@ -193,11 +193,14 @@
         CONFIDENTIAL PEER REVIEW DOCUMENT<br>
         This document contains privileged and confidential information for exclusive use in the peer review and quality control functions of the Kettering Health Network and Kettering Physician Network. This information is legally protected by Ohio Revised Code Sections 2305.25, 2305.251 and 2305.252. Further review, dissemination, distribution or copying of this information is strictly prohibited.
         </div>
-        <?php echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';?>
-        </div>
         <?php
-         $page++;
+        $page++;
+        if (!($page < ($metriccount/(2*$metrics_per_row)))){
+            echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
         }
+        echo '</div>';
+        }
+        echo '</div>';
     }
     ?>
     </div>
