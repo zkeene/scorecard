@@ -23,7 +23,7 @@ function createGraph($p, $d, $c, $q)
     $barpercent = .7;
     $topmargin = 15;
 
-    $valarray = array_merge($p,array_map('array_shift',$thresharr));
+    $valarray = array_merge(array_filter($p),array_map('array_shift',$thresharr));
     $maxv = max($valarray);
     $minv = min($valarray);
 
@@ -53,7 +53,7 @@ function createGraph($p, $d, $c, $q)
         $ypos = $barheight-scaleValue($thresh[0],$barheight,$minv,$maxv);
         echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:2"/>';
         echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="fill:'.$thresh[1].';"/>';
-        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="'.$fontsize.'" font-weight="bold" fill="#000000">'.$thresh[0].'</text>';
+        echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="'.$fontsize.'" font-weight="bold" fill="#000000">'.($thresh[0]+0).'</text>';
     }
 
     echo '</svg>';
