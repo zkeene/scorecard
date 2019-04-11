@@ -169,7 +169,7 @@
                             $messages = array(100=>null);
                         }
                     }
-                    echo getCorrectThresholdValue($messages, $metric_perf[count($metric_perf)]['performance'], $specificmetrics[$i]['threshold_direction']);
+                    echo getCorrectThresholdValue($messages, $metric_perf[$quarter_sel]['performance'], $specificmetrics[$i]['threshold_direction']);
                     echo "</div>\n";
 
                     echo '<div class="metric_def">';
