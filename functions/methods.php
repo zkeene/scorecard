@@ -296,14 +296,14 @@ function getNoDataMetrics ($specificmetrics, $performances, $quarter) {
         $metric_ids[] = $specificmetric['metric_id'];
     }
 
-    $form_perf = array();
+    $form_perf = array_fill(1,4,array());
     foreach ($performances as $performance) {
         $form_perf[$performance['quarter']][]=$performance['metric_id'];
     }
 
     $no_data_metrics = array_fill(1,4,array());
 
-    for ($i=1; $i <=$quarter; $i++){
+    for ($i=1; $i <= $quarter; $i++){
         foreach ($metric_ids as $metric_id) {
             if (!in_array($metric_id, $form_perf[$i],TRUE)){
                 $no_data_metrics[$i][] = $metric_id;

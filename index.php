@@ -47,11 +47,13 @@
             }
         }
 
+        $total_incentive = 0;
+
         $page = 0;
         $i = 0;
+        echo '<div class="provider">';
         while ($page < ($metriccount/(2*$metrics_per_row))) {
             echo '
-            <div class="provider">
             <div class="page">
             <div class="row">
                 <div class="logo">
@@ -64,7 +66,7 @@
             echo '<div class="identity">';
             echo getServiceLineName($service_line_id).' - ';
             echo $provider['provider_name'];
-            echo "</div></div>\n";
+            echo "</div><div id='incentive'></div></div>\n";
             $row=0;
             while ($i < $metriccount && $row < 2) {
                 echo '<div class="row">';
@@ -121,7 +123,7 @@
                         }
                     }
 
-                    for ($m=1; $m < 5; $m++) {
+                    for ($m=1; $m <= $quarter_sel; $m++) {
                         if (in_array($specificmetrics[$i]['metric_id'],$no_data_metrics[$m],TRUE)){
                             if ($quarter_status[$m]=='eligible') {
                                 if ($m<count($metric_perf)+1) {
@@ -157,6 +159,8 @@
                         }
                     }
 
+                    $total_incentive = $total_incentive + $inc_array[$quarter_sel];
+
                     include('constructors/metric_table.php');
 
                     echo '<div class="metric_message">';
@@ -169,7 +173,9 @@
                             $messages = array(100=>null);
                         }
                     }
-                    echo getCorrectThresholdValue($messages, $metric_perf[$quarter_sel]['performance'], $specificmetrics[$i]['threshold_direction']);
+                    if (!in_array($specificmetrics[$i]['metric_id'], $no_data_metrics[$quarter_sel], true)) {
+                        echo getCorrectThresholdValue($messages, $metric_perf[$quarter_sel]['performance'], $specificmetrics[$i]['threshold_direction']);
+                    }
                     echo "</div>\n";
 
                     echo '<div class="metric_def">';
@@ -188,10 +194,10 @@
         This document contains privileged and confidential information for exclusive use in the peer review and quality control functions of the Kettering Health Network and Kettering Physician Network. This information is legally protected by Ohio Revised Code Sections 2305.25, 2305.251 and 2305.252. Further review, dissemination, distribution or copying of this information is strictly prohibited.
         </div>
         </div>
-        </div>
         <?php
          $page++;
         }
+        echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
     }
     ?>
     </div>

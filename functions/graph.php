@@ -39,7 +39,7 @@ function createGraph($p, $d, $c, $q)
     $i = 0;
     foreach ($p as $key => $val) {
         $xcoord = ($i*$barwidth)+($i*$spacewidth)+($spacewidth/3);
-        if ($key <= $q) {
+        if (($key <= $q) && (!is_null($val))) {
             $perf_color = getCorrectThresholdValue($c, $val, $d);
             $scaledvalue = scaleValue($val, $barheight, $minv, $maxv);
             echo '<rect width="'.$barwidth.'" height="'.$scaledvalue.'" x="'.$xcoord.'" y="'.($barheight-$scaledvalue).'" style="fill:'.$perf_color.'"/>';
