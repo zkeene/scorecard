@@ -44,7 +44,7 @@ body {
 }
 .disclaimer{
     text-align: center;
-    font-size: 10pt;
+    font-size: 8pt;
 }
 .metric_title, .metric_def, .metric_graph, .metric_message{
     text-align: center;
@@ -74,5 +74,6 @@ body {
 }
 .incentive{
     text-align: center;
+    font-size: 10pt;
 }
 

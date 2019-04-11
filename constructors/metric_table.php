@@ -4,8 +4,8 @@
         <?php
         if ($specificmetrics[$i]['is_calculated_metric']) {
             for ($j=1; $j <= 4; $j++) {
-                if (($j<count($metric_perf)+1) && ($metric_perf[$j]['performance']!=null) && ($j <=$quarter_sel)) {
-                    if ($metric_perf[$j]['performance']!=null) {
+                if (($j<count($metric_perf)+1) && (isset($metric_perf[$j]['performance'])) && ($j <=$quarter_sel)) {
+                    if (isset($metric_perf[$j]['performance'])) {
                         echo '<td>'.$metric_perf[$j]['performance'].'</td>';
                     } else {
                         echo '<td>No Data</td>';
@@ -17,7 +17,7 @@
         } else {
             for ($j=1; $j <= 4; $j++) {
                 if (($j<count($metric_perf)+1) && ($j <=$quarter_sel)) {
-                    if ($metric_perf[$j]['performance']!=null) {
+                    if (isset($metric_perf[$j]['performance'])) {
                         echo '<td>'.$metric_perf[$j]['performance'].'% ('.($metric_perf[$j]['numerator']+0).'/'.$metric_perf[$j]['denominator'].')</td>';
                     } else {
                         echo '<td>No Data</td>';
@@ -27,7 +27,7 @@
                 }
             }
         }
-        if ($contract['incentive'] != 0) {
+        if (($contract['incentive'] != 0) && (!$specificmetrics[$i]['is_beta_metric'])) {
             echo '</tr><tr>';
             for ($j=1; $j <= 4; $j++) {
                 if (($j<count($metric_perf)+1) && ($j <=$quarter_sel)) {

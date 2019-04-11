@@ -124,37 +124,42 @@
                     }
 
                     for ($m=1; $m <= $quarter_sel; $m++) {
-                        if (in_array($specificmetrics[$i]['metric_id'],$no_data_metrics[$m],TRUE)){
-                            if ($quarter_status[$m]=='eligible') {
-                                if ($m<count($metric_perf)+1) {
+                        if ($specificmetrics[$i]['is_beta_metric']){
+                            $percent_incentive[$m] = 0;
+                            $inc_array[$m] = 0;
+                        } else {
+                            if (in_array($specificmetrics[$i]['metric_id'], $no_data_metrics[$m], true)) {
+                                if ($quarter_status[$m]=='eligible') {
+                                    if ($m<count($metric_perf)+1) {
+                                        $percent_incentive[$m] = 100;
+                                        $inc_array[$m] = $qtr_incentive_per_metric;
+                                    }
+                                } elseif ($quarter_status[$m]=='default') {
                                     $percent_incentive[$m] = 100;
                                     $inc_array[$m] = $qtr_incentive_per_metric;
-                                }
-                            } elseif ($quarter_status[$m]=='default') {
-                                $percent_incentive[$m] = 100;
-                                $inc_array[$m] = $qtr_incentive_per_metric;
-                            } elseif ($quarter_status[$m]=='ineligible') {
-                                $percent_incentive[$m]=0;
-                            } elseif ($quarter_status[$m]=='partial') {
-                                $partial_qtr_percent = getPartialQuarterPercent($m,$contract['effective'],$contract['default_expire'],$year_sel);
-                                $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
-                                $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
-                            }
-                        } else {
-                            if ($quarter_status[$m]=='eligible') {
-                                if ($m<count($metric_perf)+1) {
-                                    $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']);
+                                } elseif ($quarter_status[$m]=='ineligible') {
+                                    $percent_incentive[$m]=0;
+                                } elseif ($quarter_status[$m]=='partial') {
+                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
+                                    $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
                                 }
-                            } elseif ($quarter_status[$m]=='default') {
-                                $percent_incentive[$m] = 100;
-                                $inc_array[$m] = $qtr_incentive_per_metric;
-                            } elseif ($quarter_status[$m]=='ineligible') {
-                                $percent_incentive[$m]=0;
-                            } elseif ($quarter_status[$m]=='partial') {
-                                $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
-                                $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']));
-                                $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                            } else {
+                                if ($quarter_status[$m]=='eligible') {
+                                    if ($m<count($metric_perf)+1) {
+                                        $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']);
+                                        $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                    }
+                                } elseif ($quarter_status[$m]=='default') {
+                                    $percent_incentive[$m] = 100;
+                                    $inc_array[$m] = $qtr_incentive_per_metric;
+                                } elseif ($quarter_status[$m]=='ineligible') {
+                                    $percent_incentive[$m]=0;
+                                } elseif ($quarter_status[$m]=='partial') {
+                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
+                                    $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']));
+                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                }
                             }
                         }
                     }
@@ -189,15 +194,17 @@
                 echo "</div>\n";
                 $row++;
             } ?>
+        <?php        
+        if (!($page+1 < ($metriccount/(2*$metrics_per_row)))){
+            echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
+        } 
+        ?>
         <div class="disclaimer">
         CONFIDENTIAL PEER REVIEW DOCUMENT<br>
         This document contains privileged and confidential information for exclusive use in the peer review and quality control functions of the Kettering Health Network and Kettering Physician Network. This information is legally protected by Ohio Revised Code Sections 2305.25, 2305.251 and 2305.252. Further review, dissemination, distribution or copying of this information is strictly prohibited.
         </div>
         <?php
         $page++;
-        if (!($page < ($metriccount/(2*$metrics_per_row)))){
-            echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
-        }
         echo '</div>';
         }
         echo '</div>';
