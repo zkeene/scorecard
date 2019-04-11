@@ -30,10 +30,14 @@
         } else {
             $qtr_incentive = 0;
         }
-        $qtr_incentive_per_metric = $qtr_incentive/$incentive_metric_count;
+
+        $qtr_incentive_per_metric = ($incentive_metric_count > 0 ? ($qtr_incentive/$incentive_metric_count):0);
+
         $quarter_status = getContractStatusArray($contract['effective'],$contract['default_expire'],$year_sel);
 
         $performances = getPerformancesByProvider($provider['id'], $year_sel);
+
+        $no_data_metrics = getNoDataMetrics($specificmetrics, $performances, $quarter_sel);
         
         $gateway_status = getGatewayStatus($specificmetrics, $performances);
 
@@ -74,7 +78,7 @@
 
                     //build metric performance array
                     $perfkeys = array_keys(array_column($performances, 'metric_id'), $specificmetrics[$i]['metric_id']);
-                    $metric_perf = array();
+                    $metric_perf = array_fill(1,4,array('numerator'=>null,'denominator'=>null,'performance'=>null));
                     foreach ($perfkeys as $key) {
                         $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
                         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
@@ -86,43 +90,85 @@
                     }
                     
                     //color array
-                    $colors = array_column($specificmetrics[$i]['thresholds'], 'color_hex', 'threshold');
+                    if (array_key_exists('thresholds', $specificmetrics[$i])) {
+                        $colors = array_column($specificmetrics[$i]['thresholds'], 'color_hex', 'threshold');
+                    } else {
+                        if (!$specificmetrics[$i]['threshold_direction']) {
+                            $colors = array(0=>'#8c8c8c');
+                        } else {
+                            $colors = array(100=>'#8c8c8c');
+                        }
+                    }
                     //perf array to pass to create graph
                     $perfarr = array();
-                    foreach ($metric_perf as $quarter) {
-                        $perfarr[] = $quarter['performance'];
+                    foreach ($metric_perf as $key => $quarter) {
+                            $perfarr[$key] = $quarter['performance'];
                     }
-                    createGraph($perfarr, $specificmetrics[$i]['threshold_direction'], $colors);
+                    createGraph($perfarr, $specificmetrics[$i]['threshold_direction'], $colors, $quarter_sel);
                 
                     echo "</div>\n";
                 
                     //comp info array population
                     $inc_array = array_fill(1, 4, null);
                     $percent_incentive = array_fill(1, 4, null);
-                    $thresh_percent_arr = array_column($specificmetrics[$i]['thresholds'], 'threshold_incentive_percent', 'threshold');
-                
+                    if (array_key_exists('thresholds', $specificmetrics[$i])) {
+                        $thresh_percent_arr = array_column($specificmetrics[$i]['thresholds'], 'threshold_incentive_percent', 'threshold');
+                    } else {
+                        if (!$specificmetrics[$i]['threshold_direction']) {
+                            $thresh_percent_arr = array(0=>100);
+                        } else {
+                            $thresh_percent_arr = array(100=>100);
+                        }
+                    }
+
                     for ($m=1; $m < 5; $m++) {
-                        if ($quarter_status[$m]=='eligible') {
-                            if ($m<count($metric_perf)+1) {
-                                $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m-1], $specificmetrics[$i]['threshold_direction']);
+                        if (in_array($specificmetrics[$i]['metric_id'],$no_data_metrics[$m],TRUE)){
+                            if ($quarter_status[$m]=='eligible') {
+                                if ($m<count($metric_perf)+1) {
+                                    $percent_incentive[$m] = 100;
+                                    $inc_array[$m] = $qtr_incentive_per_metric;
+                                }
+                            } elseif ($quarter_status[$m]=='default') {
+                                $percent_incentive[$m] = 100;
+                                $inc_array[$m] = $qtr_incentive_per_metric;
+                            } elseif ($quarter_status[$m]=='ineligible') {
+                                $percent_incentive[$m]=0;
+                            } elseif ($quarter_status[$m]=='partial') {
+                                $partial_qtr_percent = getPartialQuarterPercent($m,$contract['effective'],$contract['default_expire'],$year_sel);
+                                $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
                                 $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
                             }
-                        } elseif ($quarter_status[$m]=='default') {
-                            $percent_incentive[$m] = 100;
-                            $inc_array[$m] = $qtr_incentive_per_metric;
-                        } elseif ($quarter_status[$m]=='ineligible') {
-                            $percent_incentive[$m]=0;
-                        } elseif ($quarter_status[$m]=='partial') {
-                            $partial_qtr_percent = getPartialQuarterPercent($m,$contract['effective'],$contract['default_expire'],$year_sel);
-                            $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m-1], $specificmetrics[$i]['threshold_direction']));
-                            $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                        } else {
+                            if ($quarter_status[$m]=='eligible') {
+                                if ($m<count($metric_perf)+1) {
+                                    $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']);
+                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                }
+                            } elseif ($quarter_status[$m]=='default') {
+                                $percent_incentive[$m] = 100;
+                                $inc_array[$m] = $qtr_incentive_per_metric;
+                            } elseif ($quarter_status[$m]=='ineligible') {
+                                $percent_incentive[$m]=0;
+                            } elseif ($quarter_status[$m]=='partial') {
+                                $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
+                                $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']));
+                                $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                            }
                         }
                     }
 
                     include('constructors/metric_table.php');
 
                     echo '<div class="metric_message">';
-                    $messages = array_column($specificmetrics[$i]['thresholds'], 'message', 'threshold');
+                    if (array_key_exists('thresholds', $specificmetrics[$i])) {
+                        $messages = array_column($specificmetrics[$i]['thresholds'], 'message', 'threshold');
+                    } else {
+                        if (!$specificmetrics[$i]['threshold_direction']) {
+                            $messages = array(0=>null);
+                        } else {
+                            $messages = array(100=>null);
+                        }
+                    }
                     echo getCorrectThresholdValue($messages, $metric_perf[count($metric_perf)]['performance'], $specificmetrics[$i]['threshold_direction']);
                     echo "</div>\n";
 

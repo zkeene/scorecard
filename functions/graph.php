@@ -7,7 +7,7 @@ function scaleValue ($value, $barheight, $minv, $maxv) {
     return $barheight * (($value - $bottom)/($top-$bottom));
 }
 
-function createGraph($p, $d, $c)
+function createGraph($p, $d, $c, $q)
 {
 
     $thresharr = array();
@@ -37,12 +37,14 @@ function createGraph($p, $d, $c)
     echo '<svg width="'.$width.'" height="'.$height.'">';
     echo '<line x1="0" x2="'.$width.'" y1="'.($barheight+1).'" y2="'.($barheight+1).'" style="stroke:black;stroke-width:2"/>';
     $i = 0;
-    foreach ($p as $val) {
-        $perf_color = getCorrectThresholdValue($c, $val, $d);
+    foreach ($p as $key => $val) {
         $xcoord = ($i*$barwidth)+($i*$spacewidth)+($spacewidth/3);
-        $scaledvalue = scaleValue($val,$barheight,$minv,$maxv);
-        echo '<rect width="'.$barwidth.'" height="'.$scaledvalue.'" x="'.$xcoord.'" y="'.($barheight-$scaledvalue).'" style="fill:'.$perf_color.'"/>';
-        echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="'.$fontsize.'" font-weight="bold">'.$val.'</text>';
+        if ($key <= $q) {
+            $perf_color = getCorrectThresholdValue($c, $val, $d);
+            $scaledvalue = scaleValue($val, $barheight, $minv, $maxv);
+            echo '<rect width="'.$barwidth.'" height="'.$scaledvalue.'" x="'.$xcoord.'" y="'.($barheight-$scaledvalue).'" style="fill:'.$perf_color.'"/>';
+            echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-20).'" font-size="'.$fontsize.'" font-weight="bold">'.$val.'</text>';
+        }
         echo '<text x="'.($xcoord+($barwidth*.4)).'" y="'.($height-4).'" font-size="'.$fontsize.'" font-weight="bold">Q'.($i+1).'</text>';
         $i++;
     }
@@ -50,7 +52,7 @@ function createGraph($p, $d, $c)
     foreach ($thresharr as $thresh) {
         $ypos = $barheight-scaleValue($thresh[0],$barheight,$minv,$maxv);
         echo '<line x1="0" x2="'.$width.'" y1="'.$ypos.'" y2="'.$ypos.'" style="stroke:'.$thresh[1].';stroke-width:2"/>';
-        echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="stroke:#000000; stroke-width:1; fill:none;"/>';
+        echo '<rect width="15" height="'.($fontsize+2).'" x="'.($width-15).'" y="'.($ypos).'" style="fill:'.$thresh[1].';"/>';
         echo '<text x="'.($width-15).'" y="'.($ypos + 10).'" font-size="'.$fontsize.'" font-weight="bold" fill="#000000">'.$thresh[0].'</text>';
     }
 

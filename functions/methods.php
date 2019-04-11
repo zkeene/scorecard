@@ -52,9 +52,9 @@ function getPerformancesByProvider($provider_id, $year)
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $performances[]=$row;
-        }
-        return $performances;
+        }  
     }
+    return $performances;
 }
 
 function getPerformacesByServiceLine($service_line_id, $year)
@@ -79,12 +79,13 @@ function getServiceLineName($service_line_id)
     $sql = "select service_line from service_lines where id=$service_line_id";
     global $conn;
     $result = $conn->query($sql);
+    $service_line = '';
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $service_line=$row['service_line'];
-        }
-        return $service_line;
+        }   
     }
+    return $service_line;
 }
 
 function getServiceLines()
@@ -142,12 +143,13 @@ function getProvidersByServiceLine($service_line_id)
     $sql = "select id, provider_name from providers where service_line_id=$service_line_id";
     global $conn;
     $result = $conn->query($sql);
+    $providers = array();
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $providers[]=$row;
         }
-        return $providers;
     }
+    return $providers;
 }
 
 function getContract($provider_id)
@@ -157,14 +159,15 @@ function getContract($provider_id)
         WHERE active=1 AND provider_id=$provider_id";
     global $conn;
     $result = $conn->query($sql);
+    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null);
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $contract['incentive'] = $row['total_incentive_amount'];
             $contract['effective'] = $row['effective_quality_date'];
             $contract['default_expire'] = $row['default_expire_date'];
         }
-        return $contract;
     }
+    return $contract;
 }
 
 function curr_format($amount) {
@@ -285,4 +288,27 @@ function getGatewayStatus ($specificmetrics, $performances) {
         }
     }
     return $gateway_status;    
+}
+
+function getNoDataMetrics ($specificmetrics, $performances, $quarter) {
+    $metric_ids = array();
+    foreach ($specificmetrics as $specificmetric) {
+        $metric_ids[] = $specificmetric['metric_id'];
+    }
+
+    $form_perf = array();
+    foreach ($performances as $performance) {
+        $form_perf[$performance['quarter']][]=$performance['metric_id'];
+    }
+
+    $no_data_metrics = array_fill(1,4,array());
+
+    for ($i=1; $i <=$quarter; $i++){
+        foreach ($metric_ids as $metric_id) {
+            if (!in_array($metric_id, $form_perf[$i],TRUE)){
+                $no_data_metrics[$i][] = $metric_id;
+            }
+        }
+    }
+    return $no_data_metrics;
 }
