@@ -4,7 +4,7 @@
         <?php
         if ($specificmetrics[$i]['is_calculated_metric']) {
             for ($j=1; $j <= 4; $j++) {
-                if (($j<count($metric_perf)+1) && (isset($metric_perf[$j]['performance'])) && ($j <=$quarter_sel)) {
+                if (($j<count($metric_perf)+1) && ($j <=$quarter_sel)) {
                     if (isset($metric_perf[$j]['performance'])) {
                         echo '<td>'.$metric_perf[$j]['performance'].'</td>';
                     } else {
