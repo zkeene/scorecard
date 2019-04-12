@@ -96,9 +96,9 @@
                         $colors = array_column($specificmetrics[$i]['thresholds'], 'color_hex', 'threshold');
                     } else {
                         if (!$specificmetrics[$i]['threshold_direction']) {
-                            $colors = array(0=>'#4775d1');
+                            $colors = array(0=>'#4488ff');
                         } else {
-                            $colors = array(100=>'#4775d1');
+                            $colors = array(100=>'#4488ff');
                         }
                     }
                     //perf array to pass to create graph
