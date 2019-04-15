@@ -22,6 +22,8 @@
 
     $providers = getProvidersByServiceLine($service_line_id);
 
+    $comp_report = array();
+
     foreach ($providers as $provider) {
 
         $contract = getContract($provider['id']);
@@ -199,6 +201,7 @@
         <?php        
         if (!($page+1 < ($metriccount/(2*$metrics_per_row)))){
             echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
+            $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive);
         } 
         ?>
         <div class="disclaimer">
@@ -212,6 +215,17 @@
         echo '</div>';
     }
     ?>
+    </div>
+    <div class="report">
+    <table><tr><th>Provider</th><th>Badge #</th><th>Incentive</th></tr>
+    <?php
+    foreach ($comp_report as $report_row) {
+        echo '<tr>';
+        echo '<td>'.$report_row['provider_name'].'</td><td>'.$report_row['badge_num'].'</td><td>'.curr_format($report_row['incentive']).'</td>';
+        echo "</tr>\n";
+    }
+    ?>
+    </table>
     </div>
 </body>
 </html>

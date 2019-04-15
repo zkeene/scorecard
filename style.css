@@ -78,4 +78,8 @@ body {
     text-align: center;
     font-size: 10pt;
 }
+.report table,.report th,.report td{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
 
