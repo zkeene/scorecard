@@ -76,7 +76,6 @@
                         <div class="metric_title">';
                     echo $specificmetrics[$i]['metric'];
                     echo "</div>\n";
-                    echo '<div class="metric_graph">';
 
                     //build metric performance array
                     $perfkeys = array_keys(array_column($performances, 'metric_id'), $specificmetrics[$i]['metric_id']);
@@ -106,10 +105,13 @@
                     foreach ($metric_perf as $key => $quarter) {
                             $perfarr[$key] = $quarter['performance'];
                     }
-                    createGraph($perfarr, $specificmetrics[$i]['threshold_direction'], $colors, $quarter_sel);
-                
-                    echo "</div>\n";
-                
+
+                    if (!$specificmetrics[$i]['is_tbd_metric']) {
+                        echo '<div class="metric_graph">';
+                        createGraph($perfarr, $specificmetrics[$i]['threshold_direction'], $colors, $quarter_sel);
+                        echo "</div>\n";
+                    }
+                    
                     //comp info array population
                     $inc_array = array_fill(1, 4, null);
                     $percent_incentive = array_fill(1, 4, null);
