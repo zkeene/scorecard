@@ -18,7 +18,18 @@
 
     $specificmetrics = getSpecificMetrics($service_line_id, $year_sel, TRUE);
     $metriccount = count($specificmetrics);
-    $incentive_metric_count = count(array_filter($specificmetrics, function ($d) {return !$d['is_beta_metric'];}));
+    $incentive_metric_count = 0;
+    foreach ($specificmetrics as $specificmetric) {
+        $add_value = 0;
+        if (!$specificmetric['is_beta_metric']){
+            if ($specificmetric['weight'] != NULL) {
+                $add_value = $specificmetric['weight'];
+            } else {
+                $add_value = 1;
+            }
+            $incentive_metric_count = $incentive_metric_count + $add_value;
+        }
+    }
 
     $providers = getProvidersByServiceLine($service_line_id);
 
