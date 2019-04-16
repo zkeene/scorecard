@@ -77,6 +77,10 @@ body {
 .incentive{
     text-align: center;
     font-size: 10pt;
+    font-weight: bold;
+    width: 25%;
+    border: solid 2px black;
+    margin: 0 auto;
 }
 .report table,.report th,.report td{
     border: 1px solid black;

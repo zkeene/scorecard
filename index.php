@@ -200,7 +200,9 @@
             } ?>
         <?php        
         if (!($page+1 < ($metriccount/(2*$metrics_per_row)))){
-            echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
+            if ($contract['incentive'] != 0) {
+                echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
+            }
             $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive);
         } 
         ?>
