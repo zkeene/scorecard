@@ -127,6 +127,12 @@
                         }
                     }
 
+                    if ($specificmetrics[$i]['weight'] != NULL) {
+                        $metric_weight = $specificmetrics[$i]['weight'];
+                    } else {
+                        $metric_weight = 1;
+                    }
+
                     for ($m=1; $m <= $quarter_sel; $m++) {
                         if ($specificmetrics[$i]['is_beta_metric']){
                             $percent_incentive[$m] = 0;
@@ -136,33 +142,33 @@
                                 if ($quarter_status[$m]=='eligible') {
                                     if ($m<count($metric_perf)+1) {
                                         $percent_incentive[$m] = 100;
-                                        $inc_array[$m] = $qtr_incentive_per_metric;
+                                        $inc_array[$m] = $qtr_incentive_per_metric*$metric_weight;
                                     }
                                 } elseif ($quarter_status[$m]=='default') {
                                     $percent_incentive[$m] = 100;
-                                    $inc_array[$m] = $qtr_incentive_per_metric;
+                                    $inc_array[$m] = $qtr_incentive_per_metric*$metric_weight;
                                 } elseif ($quarter_status[$m]=='ineligible') {
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
                                     $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
-                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
                             } else {
                                 if ($quarter_status[$m]=='eligible') {
                                     if ($m<count($metric_perf)+1) {
                                         $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']);
-                                        $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                        $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                     }
                                 } elseif ($quarter_status[$m]=='default') {
                                     $percent_incentive[$m] = 100;
-                                    $inc_array[$m] = $qtr_incentive_per_metric;
+                                    $inc_array[$m] = $qtr_incentive_per_metric*$metric_weight;
                                 } elseif ($quarter_status[$m]=='ineligible') {
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
                                     $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $year_sel);
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specificmetrics[$i]['threshold_direction']));
-                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric;
+                                    $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
                             }
                         }

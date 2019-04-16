@@ -4,7 +4,7 @@ require_once('db.php');
 
 function getSpecificMetrics($service_line_id, $year, $provider_level)
 {
-    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, is_calculated_metric, threshold_direction, is_gateway_metric, is_beta_metric, is_tbd_metric 
+    $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, is_calculated_metric, threshold_direction, is_gateway_metric, is_beta_metric, is_tbd_metric, weight 
     from specific_metrics sm, metrics
     where sm.metric_id=metrics.id AND ';
 
