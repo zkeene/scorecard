@@ -96,11 +96,13 @@
                     foreach ($perfkeys as $key) {
                         $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
                         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
-                        if ($specificmetrics[$i]['is_calculated_metric']) {
-                            $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], 1);
-                        } else {
-                            $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, 1);
-                        }
+                        if ($performances[$key]['denominator']!=0){
+                            if ($specificmetrics[$i]['is_calculated_metric']) {
+                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], 1);
+                            } else {
+                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, 1);
+                            }
+                        } 
                     }
                     
                     //color array
