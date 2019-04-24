@@ -236,7 +236,7 @@
         <?php
         $page++;
         echo '</div>';
-        if (!($page+1 < ($metriccount/(2*$metrics_per_row))) && ($page%2==1)) {
+        if (!($page < ($metriccount/(2*$metrics_per_row))) && ($page%2==1)) {
             echo '<div class="page">&nbsp</div>';
         }
         }
