@@ -94,12 +94,17 @@
                     $perfkeys = array_keys(array_column($performances, 'metric_id'), $specificmetrics[$i]['metric_id']);
                     $metric_perf = array_fill(1,4,array('numerator'=>null,'denominator'=>null,'performance'=>null));
                     foreach ($perfkeys as $key) {
+                        if (isset($specificmetrics[$i]['round_precision'])){
+                            $precision = $specificmetrics[$i]['round_precision'];
+                        } else {
+                            $precision = 1;
+                        }
                         $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
                         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
                             if ($specificmetrics[$i]['is_calculated_metric']) {
-                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], 1);
+                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], $precision);
                             } elseif ($performances[$key]['denominator']!=0) {
-                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, 1);
+                                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, $precision);
                             }
                          
                     }
