@@ -140,7 +140,7 @@ function getCorrectThresholdValue($valarr, $performance, $direction)
 
 function getProvidersByServiceLine($service_line_id)
 {
-    $sql = "select id, provider_name, badge_num from providers where service_line_id=$service_line_id";
+    $sql = "select id, provider_name, badge_num from providers where service_line_id=$service_line_id order by provider_name";
     global $conn;
     $result = $conn->query($sql);
     $providers = array();
