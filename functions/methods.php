@@ -154,7 +154,7 @@ function getProvidersByServiceLine($service_line_id)
 
 function getContract($provider_id)
 {
-    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date 
+    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, pay_cycle_id 
         FROM contracts 
         WHERE active=1 AND provider_id=$provider_id";
     global $conn;
@@ -165,6 +165,7 @@ function getContract($provider_id)
             $contract['incentive'] = $row['total_incentive_amount'];
             $contract['effective'] = $row['effective_quality_date'];
             $contract['default_expire'] = $row['default_expire_date'];
+            $contract['pay_cycle_id'] = $row['pay_cycle_id'];
         }
     }
     return $contract;
