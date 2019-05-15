@@ -14,7 +14,8 @@ if ($_POST) {
         is_gateway_metric,
         year,
         is_beta_metric,
-        is_service_line_metric
+        is_service_line_metric,
+        is_tbd_metric
     )
     SELECT 
         $target_sl AS service_line_id,
@@ -23,7 +24,8 @@ if ($_POST) {
         is_gateway_metric,
         year,
         is_beta_metric,
-        is_service_line_metric
+        is_service_line_metric,
+        is_tbd_metric
     from 
         specific_metrics
     where
