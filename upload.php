@@ -42,10 +42,16 @@ if ($_FILES) {
     ',metric_id = '.$_POST['metric'];
     }
 
-    if ($conn->query($sql_load)) {
-        echo 'Success <a href=upload_errors.php>Errors</a>';
+    $allowed_sql = "select * from period_locks where year=$year and quarter=$quarter";
+    $allowed = !($conn->query($allowed_sql));
+    if ($allowed) {
+        if ($conn->query($sql_load)) {
+            echo 'Success <a href=upload_errors.php>Errors</a>';
+        } else {
+            echo "Error: " . $sql_load . "<br>" . $conn->error;
+        }
     } else {
-        echo "Error: " . $sql_load . "<br>" . $conn->error;
+        echo 'Period Locked: Unable to Upload New Perfomance Data';
     }
     
 }

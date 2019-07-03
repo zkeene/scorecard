@@ -7,12 +7,20 @@ if ($_POST) {
         $metric_id = $_POST['metric_id'];
         $year = $_POST['year'];
         $quarter = $_POST['quarter'];
-        $sql = "delete from performances where metric_id=$metric_id and year=$year and quarter=$quarter";
 
-        if ($conn->query($sql)) {
-            echo 'Successfully deleted performance data';
+        $allowed_sql = "select * from period_locks where year=$year and quarter=$quarter";
+        $allowed = !($conn->query($allowed_sql));
+
+        if ($allowed) {
+            $sql = "delete from performances where metric_id=$metric_id and year=$year and quarter=$quarter";
+
+            if ($conn->query($sql)) {
+                echo 'Successfully deleted performance data';
+            } else {
+                echo "Error: " . $sql . "<br>" . $conn->error;
+            }
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo 'Period Locked: Unable to delete performance';
         }
     }
 }
