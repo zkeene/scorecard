@@ -13,7 +13,39 @@
     if (isset($_GET['quarter'])) {
         $quarter_sel = htmlspecialchars($_GET['quarter']);
     } else {
-        $quarter_sel = 1;
+        switch (date('n')) {
+            case 1:
+            case 2:
+            case 3:
+                $quarter_sel=4;
+                break;
+            case 4:
+            case 5:
+            case 6:
+                $quarter_sel=1;
+                break;
+            case 7:
+            case 8;
+            case 9;
+                $quarter_sel=2;
+                break;
+            case 10:
+            case 11:
+            case 12:
+                $quarter_sel=3;
+            default:
+                $quarter_sel=1;
+                break;
+        }
+    }
+    if (isset($_GET['year'])) {
+        $year_sel = htmlspecialchars($_GET['year']);
+    } else {
+        if ($quarter_sel=4) {
+            $year_sel = date('Y') - 1;
+        } else {
+            $year_sel = date('Y');
+        }
     }
     ?>
     <form action="index.php" method="get">
