@@ -225,7 +225,7 @@
         if (!($page+1 < ($metriccount/(2*$metrics_per_row)))){
             if (($contract['incentive'] != 0) && ($contract['pay_cycle_id']==2)) {
                 echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
-                $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive);
+                $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive, 'status'=>$quarter_status[$quarter_sel]);
             }
         } 
         ?>
@@ -245,11 +245,11 @@
     ?>
     </div>
     <div class="report">
-    <table><tr><th>Provider</th><th>Badge #</th><th>Incentive</th></tr>
+    <table><tr><th>Provider</th><th>Badge #</th><th>Incentive</th><th>Status</th></tr>
     <?php
     foreach ($comp_report as $report_row) {
         echo '<tr>';
-        echo '<td>'.$report_row['provider_name'].'</td><td>'.$report_row['badge_num'].'</td><td>'.curr_format($report_row['incentive']).'</td>';
+        echo '<td>'.$report_row['provider_name'].'</td><td>'.$report_row['badge_num'].'</td><td>'.curr_format($report_row['incentive']).'</td><td>'.$report_row['status'].'</td>';
         echo "</tr>\n";
     }
     ?>
