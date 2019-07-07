@@ -73,7 +73,7 @@ if ($_FILES) {
             </select><br/>
     Metric: <select name="metric">
     <?php
-        $sql = "select id, metric from metrics";
+        $sql = "select id, metric from metrics order by metric";
         $result = $conn->query($sql);
         if ($result) {
             while ($row = $result->fetch_assoc()) {
