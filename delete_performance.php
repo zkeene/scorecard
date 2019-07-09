@@ -9,9 +9,8 @@ if ($_POST) {
         $quarter = $_POST['quarter'];
 
         $allowed_sql = "select * from period_locks where year=$year and quarter=$quarter";
-        $allowed = !($conn->query($allowed_sql));
 
-        if ($allowed) {
+        if ($conn->query($allowed_sql)->num_rows==0) {
             $sql = "delete from performances where metric_id=$metric_id and year=$year and quarter=$quarter";
 
             if ($conn->query($sql)) {

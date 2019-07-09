@@ -43,8 +43,8 @@ if ($_FILES) {
     }
 
     $allowed_sql = "select * from period_locks where year=$year and quarter=$quarter";
-    $allowed = !($conn->query($allowed_sql));
-    if ($allowed) {
+
+    if ($conn->query($allowed_sql)->num_rows==0) {
         if ($conn->query($sql_load)) {
             echo 'Success <a href=upload_errors.php>Errors</a>';
         } else {
