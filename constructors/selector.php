@@ -41,7 +41,7 @@
     if (isset($_GET['year'])) {
         $year_sel = htmlspecialchars($_GET['year']);
     } else {
-        if ($quarter_sel=4) {
+        if ($quarter_sel==4) {
             $year_sel = date('Y') - 1;
         } else {
             $year_sel = date('Y');

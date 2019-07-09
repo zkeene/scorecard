@@ -36,7 +36,7 @@ if ($_POST) {
     Metric: <select name="metric_id">
     <?php
        
-        $sql_met = 'SELECT id, metric FROM metrics';
+        $sql_met = 'SELECT id, metric FROM metrics order by metric';
         $result = $conn->query($sql_met);
         if ($result) {
             while ($row = $result->fetch_assoc()) {

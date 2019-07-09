@@ -103,6 +103,12 @@
                         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
                             if ($specificmetrics[$i]['is_calculated_metric']) {
                                 $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], $precision);
+                            } elseif ($performances[$key]['denominator']==0 & $performances[$key]['numerator']==0) {
+                                if ($specificmetrics[$i]['threshold_direction']==0) {
+                                    $metric_perf[$performances[$key]['quarter']]['performance'] = round(100, $precision);
+                                } else {
+                                    $metric_perf[$performances[$key]['quarter']]['performance'] = round(0, $precision);
+                                }
                             } elseif ($performances[$key]['denominator']!=0) {
                                 $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, $precision);
                             }
