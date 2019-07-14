@@ -40,11 +40,11 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     return $specmet_array;
 }
 
-function getPerformancesByProvider($provider_id, $year)
+function getPerformancesByProvider($provider_id, $year, $period_performance=0)
 {
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
         from performances 
-        where provider_id=$provider_id and year=$year
+        where provider_id=$provider_id and year=$year and period_performance=$period_performance
         group by metric_id, quarter order by metric_id, quarter";
     global $conn;
     $performances = array();
@@ -57,11 +57,11 @@ function getPerformancesByProvider($provider_id, $year)
     return $performances;
 }
 
-function getPerformacesByServiceLine($service_line_id, $year)
+function getPerformacesByServiceLine($service_line_id, $year, $period_performance=0)
 {
     $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
         from performances, locations
-        where performances.location_id = locations.id and locations.service_line_id=$service_line_id and year=$year
+        where performances.location_id = locations.id and locations.service_line_id=$service_line_id and year=$year and period_performance=$period_performance
         group by metric_id, quarter order by metric_id, quarter";
     global $conn;
     $performances = array();
@@ -312,4 +312,43 @@ function getNoDataMetrics ($specificmetrics, $performances, $quarter) {
         }
     }
     return $no_data_metrics;
+}
+
+function isServiceLinePeriodBased ($service_line_id) {
+    $sql = "select is_period_based from service_lines where id=$service_line_id";
+    global $conn;
+    $result = $conn->query($sql);
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $is_period_based = $row['is_period_based'];
+        }
+        return $is_period_based;
+    }
+}
+
+function getMetricPerformanceArray ($performances, $specific_metric){
+    if (isset($specific_metric['round_precision'])){
+        $precision = $specific_metric['round_precision'];
+    } else {
+        $precision = 1;
+    }
+    $perfkeys = array_keys(array_column($performances, 'metric_id'), $specific_metric['metric_id']);
+    $metric_perf = array_fill(1,4,array('numerator'=>null,'denominator'=>null,'performance'=>null));
+    foreach ($perfkeys as $key) {
+        $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
+        $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
+            if ($specific_metric['is_calculated_metric']) {
+                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator'], $precision);
+            } elseif ($performances[$key]['denominator']==0 & $performances[$key]['numerator']==0) {
+                if ($specific_metric['threshold_direction']==0) {
+                    $metric_perf[$performances[$key]['quarter']]['performance'] = round(100, $precision);
+                } else {
+                    $metric_perf[$performances[$key]['quarter']]['performance'] = round(0, $precision);
+                }
+            } elseif ($performances[$key]['denominator']!=0) {
+                $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, $precision);
+            }
+         
+    }
+    return $metric_perf;
 }
