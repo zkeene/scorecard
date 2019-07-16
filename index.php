@@ -96,7 +96,7 @@
                     
                     $metric_perf = getMetricPerformanceArray($performances,$specific_metric);
                     
-                    $period_metric_perf = getMetricPerformanceArray($period_performances,$specific_metric);
+                    $period_metric_perf = getMetricPerformanceArray($period_performances,$specific_metric, TRUE);
                     
                     //color array
                     if (array_key_exists('thresholds', $specific_metric)) {
@@ -192,6 +192,10 @@
                     $total_incentive = $total_incentive + $inc_array[$quarter_sel];
 
                     include('constructors/metric_table.php');
+
+                    if(isServiceLinePeriodBased($service_line_id)) {
+                        include ('constructors/period_table.php');
+                    }
 
                     echo '<div class="metric_message">';
                     if (array_key_exists('thresholds', $specific_metric)) {

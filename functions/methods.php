@@ -326,14 +326,18 @@ function isServiceLinePeriodBased ($service_line_id) {
     }
 }
 
-function getMetricPerformanceArray ($performances, $specific_metric){
+function getMetricPerformanceArray ($performances, $specific_metric, $period_based = FALSE){
     if (isset($specific_metric['round_precision'])){
         $precision = $specific_metric['round_precision'];
     } else {
         $precision = 1;
     }
     $perfkeys = array_keys(array_column($performances, 'metric_id'), $specific_metric['metric_id']);
-    $metric_perf = array_fill(1,4,array('numerator'=>null,'denominator'=>null,'performance'=>null));
+    $num_of_keys = 4;
+    if ($period_based) {
+        $num_of_keys = 2;
+    }
+    $metric_perf = array_fill(1,$num_of_keys,array('numerator'=>null,'denominator'=>null,'performance'=>null));
     foreach ($perfkeys as $key) {
         $metric_perf[$performances[$key]['quarter']]['numerator'] = $performances[$key]['numerator'];
         $metric_perf[$performances[$key]['quarter']]['denominator'] = $performances[$key]['denominator'];
