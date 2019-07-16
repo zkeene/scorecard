@@ -4,10 +4,17 @@
         <tr><td>P1</td><td>P2</td></tr>
         <tr>
         <?php
-        $period1 = $period_metric_perf[1]['performance'].'% ('.$period_metric_perf[1]['numerator'].'/'.$period_metric_perf[1]['denominator'].')';
-        $period2 = $period_metric_perf[2]['performance'].'% ('.$period_metric_perf[2]['numerator'].'/'.$period_metric_perf[2]['denominator'].')';;
-        echo '<td>'.$period1.'</td>';
-        echo '<td>'.$period2.'</td>';
+        $index = 1;
+        while ($index < 3) {
+            if (isset($period_metric_perf[$index]['performance'])) {
+                echo '<td>'.$period_metric_perf[$index]['performance'].
+                '% ('.$period_metric_perf[$index]['numerator'].
+                '/'.$period_metric_perf[$index]['denominator'].')</td>';
+            } else {
+                echo '<td></td>';
+            }
+            $index++;
+        }
         ?>
         </tr>
     </table>
