@@ -154,7 +154,7 @@ function getProvidersByServiceLine($service_line_id)
 
 function getContract($provider_id)
 {
-    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, pay_cycle_id 
+    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, inactive_date, pay_cycle_id 
         FROM contracts 
         WHERE active=1 AND provider_id=$provider_id";
     global $conn;
@@ -165,6 +165,7 @@ function getContract($provider_id)
             $contract['incentive'] = $row['total_incentive_amount'];
             $contract['effective'] = $row['effective_quality_date'];
             $contract['default_expire'] = $row['default_expire_date'];
+            $contract['inactive'] = $row['inactive_date'];
             $contract['pay_cycle_id'] = $row['pay_cycle_id'];
         }
     }
@@ -183,22 +184,23 @@ function day_diff ($date1, $date2) {
    return date_diff($date1, $date2) -> format("%r%a");
 }
 
-function getContractStatusArray ($effective_str, $default_expire_str, $year_sel) {
+function getContractStatusArray ($effective_str, $default_expire_str, $inactive_str, $year_sel) {
     $effective = strtotime($effective_str);
     $default_expire = strtotime($default_expire_str);
+    $inactive = strtotime($inactive_str);
     $year_start = strtotime($year_sel.'-1-1');
     $year_end = strtotime($year_sel.'-12-31');
     $quarter_start = array(1=>strtotime($year_sel.'-1-1'),2=>strtotime($year_sel.'-4-1'),3=>strtotime($year_sel.'-7-1'),4=>strtotime($year_sel.'-10-1'));
     $quarter_end = array(1=>strtotime($year_sel.'-3-31'),2=>strtotime($year_sel.'-6-30'),3=>strtotime($year_sel.'-9-30'),4=>strtotime($year_sel.'-12-31'));
     $quarter_status = array_fill(1, 4, null);
 
-    //full eligbile (performance based): effective date at beginning of year or prior AND default expired prior to beginning of year
-    if (($effective <= $year_start) && ($default_expire < $year_start)) {
+    //full eligbile (performance based): effective date at beginning of year or prior AND default expired prior to beginning of year AND inactive after end of year or empty
+    if (($effective <= $year_start) && ($default_expire < $year_start) && (($inactive > $year_end) || is_null($inactive))) {
         for ($m=1; $m < 5; $m++) {
             $quarter_status[$m] = 'eligible';
         }
         //full default (max possible): effective date at beginning of year or prior AND (default expires after year end OR no default expiration)
-    } elseif (($effective <= $year_start) && (($default_expire >= $year_end) || (is_null($default_expire)))) {
+    } elseif (($effective <= $year_start) && (($default_expire >= $year_end) || (is_null($default_expire))) && (($inactive > $year_end) || is_null($inactive))) {
         for ($m=1; $m < 5; $m++) {
             $quarter_status[$m] = 'default';
         }
@@ -210,9 +212,9 @@ function getContractStatusArray ($effective_str, $default_expire_str, $year_sel)
         //not full year: will evaluate each quarter and each time period in quarter (first eval quarter to apply full logic if applicable)
     } else {
         for ($m=1; $m < 5; $m++) {
-            if (($effective <= $quarter_start[$m]) && ($default_expire < $quarter_start[$m])) {
+            if (($effective <= $quarter_start[$m]) && ($default_expire < $quarter_start[$m]) && (($inactive > $quarter_end[$m]) || is_null($inactive))) {
                 $quarter_status[$m] = 'eligible';
-            } elseif (($effective <= $quarter_start[$m]) && (($default_expire >= $quarter_end[$m]) || (is_null($default_expire)))) {
+            } elseif (($effective <= $quarter_start[$m]) && (($default_expire >= $quarter_end[$m]) || (is_null($default_expire))) && (($inactive > $quarter_end[$m]) || is_null($inactive))) {
                 $quarter_status[$m] = 'default';
             } elseif (($effective > $quarter_end[$m]) || (is_null($effective))) {
                 $quarter_status[$m] = 'ineligible';
@@ -224,34 +226,51 @@ function getContractStatusArray ($effective_str, $default_expire_str, $year_sel)
     return $quarter_status;
 }
 
-function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str, $year_sel) {
+function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str, $inactive_str, $year_sel) {
 
     $default_days = 0;
     $eligible_days = 0;
 
     $effective = date_create($effective_str);
     $default_expire = date_create($default_expire_str);
+    $inactive = date_create($inactive_str);
     $quarter_start = array(1=>date_create($year_sel.'-1-1'),2=>date_create($year_sel.'-4-1'),3=>date_create($year_sel.'-7-1'),4=>date_create($year_sel.'-10-1'));
     $quarter_end = array(1=>date_create($year_sel.'-3-31'),2=>date_create($year_sel.'-6-30'),3=>date_create($year_sel.'-9-30'),4=>date_create($year_sel.'-12-31'));
    
     $days_in_quarter = day_diff($quarter_start[$quarter], $quarter_end[$quarter]);
     $qtr_start_to_def_expire = day_diff($quarter_start[$quarter], $default_expire);
     $qtr_start_to_effective = day_diff($quarter_start[$quarter], $effective);
+    $qtr_start_to_inactive = day_diff($quarter_start[$quarter], $inactive);
     $def_expire_to_qtr_end = day_diff($default_expire, $quarter_end[$quarter]);
+    $def_expire_to_inactive = day_diff($default_expire,$inactive);
     $effective_to_qtr_end = day_diff($effective, $quarter_end[$quarter]);
-    $effective_to_def_expire = day_diff($effective,$default_expire);
+    $effective_to_def_expire = day_diff($effective, $default_expire);
+    $effective_to_inactive = day_diff($effective, $inactive);
 
     $effective_in_quarter = $effective <= $quarter_end[$quarter] && $effective >= $quarter_start[$quarter];
     $default_expire_in_quarter = $default_expire <= $quarter_end[$quarter] && $default_expire >= $quarter_start[$quarter];
+    $inactive_in_quarter = $inactive < $quarter_end[$quarter] && $inactive > $quarter_start[$quarter];
 
-    if ($effective_in_quarter && $default_expire_in_quarter){
-        $eligible_days = $def_expire_to_qtr_end;
-        $default_days = $effective_to_def_expire;
-    } elseif ($effective_in_quarter) {
-        $default_days = $effective_to_qtr_end;
-    } elseif ($default_expire_in_quarter) {
-        $eligible_days = $def_expire_to_qtr_end;
-        $default_days = $qtr_start_to_def_expire;
+    if (!$inactive_in_quarter) {
+        if ($effective_in_quarter && $default_expire_in_quarter) {
+            $eligible_days = $def_expire_to_qtr_end;
+            $default_days = $effective_to_def_expire;
+        } elseif ($effective_in_quarter) {
+            $default_days = $effective_to_qtr_end;
+        } elseif ($default_expire_in_quarter) {
+            $eligible_days = $def_expire_to_qtr_end;
+            $default_days = $qtr_start_to_def_expire;
+        }
+    } else {
+        if ($effective_in_quarter && $default_expire_in_quarter) {
+            $eligible_days = $def_expire_to_inactive;
+            $default_days = $effective_to_def_expire;
+        } elseif ($effective_in_quarter) {
+            $default_days = $effective_to_inactive;
+        } elseif ($default_expire_in_quarter) {
+            $eligible_days = $def_expire_to_inactive;
+            $default_days = $qtr_start_to_def_expire;
+        }
     }
 
     $partial_qtr_percent = array('default'=>($default_days/$days_in_quarter*100),'eligible'=>($eligible_days/$days_in_quarter*100));
