@@ -159,7 +159,7 @@ function getContract($provider_id)
         WHERE active=1 AND provider_id=$provider_id";
     global $conn;
     $result = $conn->query($sql);
-    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null);
+    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null, 'inactive'=>null);
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $contract['incentive'] = $row['total_incentive_amount'];
@@ -216,7 +216,7 @@ function getContractStatusArray ($effective_str, $default_expire_str, $inactive_
                 $quarter_status[$m] = 'eligible';
             } elseif (($effective <= $quarter_start[$m]) && (($default_expire >= $quarter_end[$m]) || (is_null($default_expire))) && (($inactive > $quarter_end[$m]) || is_null($inactive))) {
                 $quarter_status[$m] = 'default';
-            } elseif (($effective > $quarter_end[$m]) || (is_null($effective))) {
+            } elseif (($effective > $quarter_end[$m]) || (is_null($effective)) || $inactive < $quarter_start[$m]) {
                 $quarter_status[$m] = 'ineligible';
             } else {
                 $quarter_status[$m] = 'partial';
@@ -270,6 +270,8 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
         } elseif ($default_expire_in_quarter) {
             $eligible_days = $def_expire_to_inactive;
             $default_days = $qtr_start_to_def_expire;
+        } else {
+            $eligible_days = $qtr_start_to_inactive;
         }
     }
 
