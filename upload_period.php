@@ -64,7 +64,7 @@ if ($_FILES) {
 <title>Performance Upload</title>
 </head>
 <body>
-<form enctype="multipart/form-data" action="upload.php" method="POST">
+<form enctype="multipart/form-data" action="upload_period.php" method="POST">
     <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
     Year: <input name="year_sel" type="text" size="4" /><br/>
     Period: <select name="quarter">
