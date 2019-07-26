@@ -236,7 +236,7 @@ function getContractStatusArray ($effective_str, $default_expire_str, $inactive_
             $default_expire_before_qtr_start = $default_expire < $quarter_start[$m];
             $not_inactive_in_qtr = ($inactive > $quarter_end[$m]) || $inactive_is_null;
             $default_expire_after_qtr_end = ($default_expire >= $quarter_end[$m]) || $default_is_null;
-            $inactive_before_qtr_start = $inactive < $quarter_start[$m];
+            $inactive_before_qtr_start = ($inactive < $quarter_start[$m]) && (!$inactive_is_null);
 
             if ($effective_before_qtr_start && $default_expire_before_qtr_start && $not_inactive_in_qtr) {
                 $quarter_status[$m] = 'eligible';
