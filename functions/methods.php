@@ -185,6 +185,8 @@ function day_diff ($date1, $date2) {
 }
 
 function getContractStatusArray ($effective_str, $default_expire_str, $inactive_str, $year_sel) {
+    
+    //dates
     $effective = strtotime($effective_str);
     $default_expire = strtotime($default_expire_str);
     $inactive = strtotime($inactive_str);
@@ -193,31 +195,54 @@ function getContractStatusArray ($effective_str, $default_expire_str, $inactive_
     $null_date = strtotime('0000-00-00');
     $quarter_start = array(1=>strtotime($year_sel.'-1-1'),2=>strtotime($year_sel.'-4-1'),3=>strtotime($year_sel.'-7-1'),4=>strtotime($year_sel.'-10-1'));
     $quarter_end = array(1=>strtotime($year_sel.'-3-31'),2=>strtotime($year_sel.'-6-30'),3=>strtotime($year_sel.'-9-30'),4=>strtotime($year_sel.'-12-31'));
+    
+    //initialize status array
     $quarter_status = array_fill(1, 4, null);
 
+    //null date evaluations
+    $inactive_is_null = ($inactive == $null_date) || is_null($inactive) || empty($inactive);
+    $default_is_null = ($default_expire == $null_date) || is_null($default_expire) || empty($default_expire);
+    $effective_is_null = ($effective == $null_date) || is_null($effective) || empty($effective);
+
+    //year date evaluations
+    $effective_before_year_start = $effective <= $year_start;
+    $default_expire_before_year_start = $default_expire < $year_start;
+    $not_inactive_in_year = ($inactive > $year_end) || $inactive_is_null;
+    $default_expire_after_year_end = ($default_expire >= $year_end) || $default_is_null;
+    $effective_after_year_end = ($effective > $year_end) || $effective_is_null;
+
     //full eligbile (performance based): effective date at beginning of year or prior AND default expired prior to beginning of year AND inactive after end of year or empty
-    if (($effective <= $year_start) && ($default_expire < $year_start) && (($inactive == $null_date) || ($inactive > $year_end))) {
+    if ($effective_before_year_start && $default_expire_before_year_start && $not_inactive_in_year) {
         for ($m=1; $m < 5; $m++) {
             $quarter_status[$m] = 'eligible';
         }
         //full default (max possible): effective date at beginning of year or prior AND (default expires after year end OR no default expiration)
-    } elseif (($effective <= $year_start) && (($default_expire >= $year_end) || ($default_expire == $null_date)) && (($inactive == $null_date) || ($inactive > $year_end))) {
+    } elseif ($effective_before_year_start && $default_expire_after_year_end && $not_inactive_in_year) {
         for ($m=1; $m < 5; $m++) {
             $quarter_status[$m] = 'default';
         }
         //full ineligible (zero): effective date is after year end OR effective date doesn't exist
-    } elseif (($effective > $year_end) || ($effective == $null_date)) {
+    } elseif ($effective_after_year_end) {
         for ($m=1; $m < 5; $m++) {
             $quarter_status[$m] = 'ineligible';
         }
         //not full year: will evaluate each quarter and each time period in quarter (first eval quarter to apply full logic if applicable)
     } else {
         for ($m=1; $m < 5; $m++) {
-            if (($effective <= $quarter_start[$m]) && ($default_expire < $quarter_start[$m]) && (($inactive > $quarter_end[$m]) || ($inactive == $null_date))) {
+
+            //quarter date evaluations
+            $effective_before_qtr_start = $effective <= $quarter_start[$m];
+            $effective_after_qtr_end = $effective > $quarter_end[$m];
+            $default_expire_before_qtr_start = $default_expire < $quarter_start[$m];
+            $not_inactive_in_qtr = ($inactive > $quarter_end[$m]) || $inactive_is_null;
+            $default_expire_after_qtr_end = ($default_expire >= $quarter_end[$m]) || $default_is_null;
+            $inactive_before_qtr_start = $inactive < $quarter_start[$m];
+
+            if ($effective_before_qtr_start && $default_expire_before_qtr_start && $not_inactive_in_qtr) {
                 $quarter_status[$m] = 'eligible';
-            } elseif (($effective <= $quarter_start[$m]) && (($default_expire >= $quarter_end[$m]) || ($default_expire == $null_date)) && (($inactive > $quarter_end[$m]) || ($inactive == $null_date))) {
+            } elseif ($effective_before_qtr_start && $default_expire_after_qtr_end && $not_inactive_in_qtr) {
                 $quarter_status[$m] = 'default';
-            } elseif (($effective > $quarter_end[$m]) || (is_null($effective)) || $inactive < $quarter_start[$m]) {
+            } elseif ($effective_after_qtr_end || $effective_is_null || $inactive_before_qtr_start) {
                 $quarter_status[$m] = 'ineligible';
             } else {
                 $quarter_status[$m] = 'partial';
