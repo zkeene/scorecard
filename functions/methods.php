@@ -291,6 +291,8 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
         } elseif ($default_expire_in_quarter) {
             $eligible_days = $def_expire_to_qtr_end;
             $default_days = $qtr_start_to_def_expire;
+        } else {
+            $eligible_days = $days_in_quarter;
         }
     } else {
         if ($effective_in_quarter && $default_expire_in_quarter) {
