@@ -8,8 +8,7 @@
         while ($index < 3) {
             if (isset($period_metric_perf[$index]['performance'])) {
                 echo '<td>'.$period_metric_perf[$index]['performance'].
-                '% ('.$period_metric_perf[$index]['numerator'].
-                '/'.$period_metric_perf[$index]['denominator'].')</td>';
+                '%'.'</td>';
             } else {
                 echo '<td></td>';
             }
