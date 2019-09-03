@@ -26,7 +26,7 @@ order by metric asc';
             <h3>Denominator</h3>
             <?=$row['denominator_definition']?>
             <h3>Exclusion/Exceptions</h3>
-            <?=$row['denominator_definition']?>
+            <?=$row['exclusion_definition']?>
             </div>
         <?php }
         $result->free();
