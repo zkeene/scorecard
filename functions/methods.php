@@ -90,7 +90,7 @@ function getServiceLineName($service_line_id)
 
 function getServiceLines()
 {
-    $sql = "select id, service_line from service_lines";
+    $sql = "select id, service_line from service_lines order by service_line";
     global $conn;
     $result = $conn->query($sql);
     if ($result) {
