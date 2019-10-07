@@ -21,7 +21,7 @@
                 for ($j=1; $j <= 4; $j++) {
                     if (($j<count($metric_perf)+1) && ($j <=$quarter_sel)) {
                         if (isset($metric_perf[$j]['performance']) && ($metric_perf[$j]['denominator']!=0)) {
-                            echo '<td>'.$metric_perf[$j]['performance'].'% ('.($metric_perf[$j]['numerator']+0).'/'.$metric_perf[$j]['denominator'].')</td>';
+                            echo '<td>'.$metric_perf[$j]['performance'].'% ('.($metric_perf[$j]['numerator']+0).'/ '.$metric_perf[$j]['denominator'].')</td>';
                         } elseif (isset($metric_perf[$j]['denominator']) && ($metric_perf[$j]['denominator']==0)) {
                             echo '<td>(0/0)</td>';
                         } else {

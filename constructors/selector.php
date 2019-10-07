@@ -33,6 +33,7 @@
             case 11:
             case 12:
                 $quarter_sel=3;
+                break;
             default:
                 $quarter_sel=1;
                 break;
