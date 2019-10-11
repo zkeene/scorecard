@@ -9,11 +9,16 @@ global $conn;
 </head>
 <body>
 <?php
-$sql = 'SELECT provider_name, service_line, NPI, SER, badge_num, provider_type 
-from providers, service_lines, provider_types
-where providers.service_line_id=service_lines.id AND providers.provider_type_id=provider_types.id AND
-provider_status=1
-order by provider_name asc';
+$sql = 'SELECT provider_name, service_line, NPI, SER, badge_num, provider_type, total_incentive_amount, if(default_expire_date > current_date(),"Defaulted", "") as defaulted 
+FROM providers
+inner join service_lines
+on providers.service_line_id = service_lines.id
+inner join provider_types
+on providers.provider_type_id = provider_types.id
+left join contracts
+on providers.id = contracts.provider_id
+WHERE provider_status=1
+order by provider_name ASC';
 ?>
 <table border=1>
 <?php
