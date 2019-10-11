@@ -9,7 +9,7 @@ global $conn;
 </head>
 <body>
 <?php
-$sql = 'SELECT provider_name, service_line, NPI, SER, badge_num, provider_type, total_incentive_amount, if(default_expire_date > current_date(),"Defaulted", "") as defaulted 
+$sql = 'SELECT provider_name, service_line, NPI, SER, badge_num, provider_type, total_incentive_amount, if(default_expire_date > current_date(),"Defaulted", "") as defaulted, default_expire_date 
 FROM providers
 inner join service_lines
 on providers.service_line_id = service_lines.id
