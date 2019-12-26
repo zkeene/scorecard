@@ -2,6 +2,8 @@
 
 require_once('db.php');
 
+include('helpers.php');
+
 function getSpecificMetrics($service_line_id, $year, $provider_level)
 {
     $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, is_calculated_metric, threshold_direction, is_gateway_metric, is_beta_metric, is_tbd_metric, weight, round_precision 
@@ -42,76 +44,34 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
 
 function getPerformancesByProvider($provider_id, $year, $period_performance=0)
 {
-    $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
-        from performances 
-        where provider_id=$provider_id and year=$year and period_performance=$period_performance
-        group by metric_id, quarter order by metric_id, quarter";
-    global $conn;
-    $performances = array();
-    $result = $conn->query($sql);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $performances[]=$row;
-        }  
-    }
-    return $performances;
+    $fields = ['metric_id', 'quarter', 'sum(numerator) as numerator', 'sum(denominator) as denominator'];
+    $where = ["provider_id=$provider_id", "year=$year", "period_performance=$period_performance"];
+    $by = ['metric_id', 'quarter'];
+    return sqlSelectQuery($fields, 'performances', $where, $by, $by);
 }
 
-function getPerformacesByServiceLine($service_line_id, $year, $period_performance=0)
+function getPerformancesByServiceLine($service_line_id, $year, $period_performance=0)
 {
-    $sql = "select metric_id, quarter, sum(numerator) as numerator, sum(denominator) as denominator
-        from performances, locations
-        where performances.location_id = locations.id and locations.service_line_id=$service_line_id and year=$year and period_performance=$period_performance
-        group by metric_id, quarter order by metric_id, quarter";
-    global $conn;
-    $performances = array();
-    $result = $conn->query($sql);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $performances[]=$row;
-        }
-        return $performances;
-    }
+    $fields = ['metric_id', 'quarter', 'sum(numerator) as numerator', 'sum(denominator) as denominator'];
+    $tables = 'performances, locations';
+    $where = ['performances.location_id = locations.id', "locations.service_line_id=$service_line_id", "year=$year", "period_performance=$period_performance"];
+    $by = ['metric_id', 'quarter'];
+    return sqlSelectQuery($fields, $tables, $where, $by, $by);
 }
 
 function getServiceLineName($service_line_id)
 {
-    $sql = "select service_line from service_lines where id=$service_line_id";
-    global $conn;
-    $result = $conn->query($sql);
-    $service_line = '';
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $service_line=$row['service_line'];
-        }   
-    }
-    return $service_line;
+    return sqlSelectQuery(['service_line'],'service_lines',["id=1"])[0]['service_line'];
 }
 
 function getServiceLines()
 {
-    $sql = "select id, service_line from service_lines order by service_line";
-    global $conn;
-    $result = $conn->query($sql);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $service_lines[]=$row;
-        }
-        return $service_lines;
-    }
+    return sqlSelectQuery(['id', 'service_line'],'service_lines',[],['service_line']);
 }
 
 function getYears()
 {
-    $sql = "select distinct year from specific_metrics";
-    global $conn;
-    $result = $conn->query($sql);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $years[] = $row['year'];
-        }
-        return $years;
-    }
+    return sqlSelectQuery(['distinct year'],'specific_metrics');
 }
 
 function getCorrectThresholdValue($valarr, $performance, $direction)
@@ -140,20 +100,15 @@ function getCorrectThresholdValue($valarr, $performance, $direction)
 
 function getProvidersByServiceLine($service_line_id)
 {
-    $sql = "select id, provider_name, badge_num from providers where service_line_id=$service_line_id and provider_status=1 order by provider_name";
-    global $conn;
-    $result = $conn->query($sql);
-    $providers = array();
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $providers[]=$row;
-        }
-    }
-    return $providers;
+    $fields = ['id', 'provider_name', 'badge_num'];
+    $where = ['provider_status=1', "service_line_id=$service_line_id"];
+    return sqlSelectQuery($fields, 'providers', $where, ['provider_name']);
 }
 
 function getContract($provider_id)
 {
+    //$fields = ['total_incentive_amount as incentive', 'effective_quality_date as effective', 'default_expire_date as default_expire', 'inactive_date as inactive', 'pay_cycle_id'];
+    //Need to test before converting to sqlSelectQuery, likely will need addtional manipulation based on the array being passed currently
     $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, inactive_date, pay_cycle_id 
         FROM contracts 
         WHERE active=1 AND provider_id=$provider_id";
@@ -170,18 +125,6 @@ function getContract($provider_id)
         }
     }
     return $contract;
-}
-
-function curr_format($amount) {
-    return '$'.number_format($amount, 0);
-}
-
-function getQuarterFromDate ($date_to_check) {
-    return ceil(date('n', strtotime($date_to_check))/ 3);
-}
-
-function day_diff ($date1, $date2) {
-   return date_diff($date1, $date2) -> format("%r%a");
 }
 
 function getContractStatusArray ($effective_str, $default_expire_str, $inactive_str, $year_sel) {
@@ -262,7 +205,7 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
     $inactive = date_create($inactive_str);
     $quarter_start = array(1=>date_create($year_sel.'-1-1'),2=>date_create($year_sel.'-4-1'),3=>date_create($year_sel.'-7-1'),4=>date_create($year_sel.'-10-1'));
     $quarter_end = array(1=>date_create($year_sel.'-3-31'),2=>date_create($year_sel.'-6-30'),3=>date_create($year_sel.'-9-30'),4=>date_create($year_sel.'-12-31'));
-   
+
     $days_in_quarter = day_diff($quarter_start[$quarter], $quarter_end[$quarter]);
     $qtr_start_to_def_expire = day_diff($quarter_start[$quarter], $default_expire);
     $qtr_start_to_effective = day_diff($quarter_start[$quarter], $effective);
@@ -275,7 +218,7 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
 
     $effective_in_quarter = $effective <= $quarter_end[$quarter] && $effective >= $quarter_start[$quarter];
     $default_expire_in_quarter = $default_expire <= $quarter_end[$quarter] && $default_expire >= $quarter_start[$quarter];
-   
+
     if ($inactive_str != '0000-00-00'){
         $inactive_in_quarter = $inactive < $quarter_end[$quarter] && $inactive > $quarter_start[$quarter];
     } else {
@@ -369,15 +312,7 @@ function getNoDataMetrics ($specificmetrics, $performances, $quarter) {
 }
 
 function isServiceLinePeriodBased ($service_line_id) {
-    $sql = "select is_period_based from service_lines where id=$service_line_id";
-    global $conn;
-    $result = $conn->query($sql);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $is_period_based = $row['is_period_based'];
-        }
-        return $is_period_based;
-    }
+    return sqlSelectQuery(['is_period_based'],'service_lines',["id=$service_line_id"])[0]['is_period_based'];
 }
 
 function getMetricPerformanceArray ($performances, $specific_metric, $period_based = FALSE){
@@ -406,7 +341,16 @@ function getMetricPerformanceArray ($performances, $specific_metric, $period_bas
             } elseif ($performances[$key]['denominator']!=0) {
                 $metric_perf[$performances[$key]['quarter']]['performance'] = round($performances[$key]['numerator']/$performances[$key]['denominator']*100, $precision);
             }
-         
     }
     return $metric_perf;
+}
+
+function getProviderOverrides($provider_id)
+{
+    return sqlSelectQuery(['id', 'time_frame', 'target_quarter', 'target_year'],'overrides',['override_type=1',"provider_id=$provider_id"]);
+}
+
+function getSpecificMetricOverrides($specific_metric_id)
+{
+    return sqlSelectQuery(['id','time_frame','target_quarter'],'overrides',['override_type=0',"specific_metric_id=$specific_metric_id"]);
 }
