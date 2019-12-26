@@ -71,7 +71,11 @@ function getServiceLines()
 
 function getYears()
 {
-    return sqlSelectQuery(['distinct year'],'specific_metrics');
+    $years_array =  sqlSelectQuery(['distinct year'],'specific_metrics');
+    foreach ($years_array as $year) {
+        $years[]=$year['year'];
+    }
+    return $years;
 }
 
 function getCorrectThresholdValue($valarr, $performance, $direction)
