@@ -102,7 +102,7 @@ function getCorrectThresholdValue($valarr, $performance, $direction)
     }
 }
 
-function getProvidersByServiceLine($service_line_id)
+function getProvidersByServiceLine(int $service_line_id) //Returns an array with each element having id, provider_name and badge_num
 {
     $fields = ['id', 'provider_name', 'badge_num'];
     $where = ['provider_status=1', "service_line_id=$service_line_id"];

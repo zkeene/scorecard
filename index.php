@@ -16,7 +16,9 @@
     $metrics_per_row = 2;
 
     $specificmetrics = getSpecificMetrics($service_line_id, $year_sel, TRUE);
+    //metric count for paging purposes
     $metriccount = count($specificmetrics);
+    //total incentive weight
     $incentive_metric_count = 0;
     foreach ($specificmetrics as $specificmetric) {
         $add_value = 0;
@@ -132,6 +134,9 @@
                     //comp info array population
                     $inc_array = array_fill(1, 4, null);
                     $percent_incentive = array_fill(1, 4, null);
+
+                    $specific_metric_overrides = getSpecificMetricOverrides($specific_metric['id']);
+
                     if (array_key_exists('thresholds', $specific_metric)) {
                         $thresh_percent_arr = array_column($specific_metric['thresholds'], 'threshold_incentive_percent', 'threshold');
                     } else {
@@ -153,7 +158,18 @@
                             $percent_incentive[$m] = 0;
                             $inc_array[$m] = 0;
                         } else {
-                            if (in_array($specific_metric['metric_id'], $no_data_metrics[$m], true)) {
+                            
+                            $isOverriden = false;
+                            foreach ($specific_metric_overrides as $override) {
+                                if ($override['time_frame']==0){
+                                    $isOverriden = true;
+                                }
+                                if ($override['time_frame']==1 && $override['target_quarter']==$m) {
+                                    $isOverriden = true;
+                                }
+                            }
+
+                            if (in_array($specific_metric['metric_id'], $no_data_metrics[$m], true) || $isOverriden) {
                                 if ($quarter_status[$m]=='eligible') {
                                     if ($m<count($metric_perf)+1) {
                                         $percent_incentive[$m] = 100;
