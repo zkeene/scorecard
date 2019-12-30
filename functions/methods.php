@@ -61,7 +61,7 @@ function getPerformancesByServiceLine($service_line_id, $year, $period_performan
 
 function getServiceLineName($service_line_id)
 {
-    return sqlSelectQuery(['service_line'],'service_lines',["id=1"])[0]['service_line'];
+    return sqlSelectQuery(['service_line'],'service_lines',["id=$service_line_id"])[0]['service_line'];
 }
 
 function getServiceLines()
