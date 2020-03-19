@@ -83,7 +83,6 @@ if ($_POST) {
 
     Specific Metric to Duplicate: <select name="dup_metric">
     <?php
-       
         $sql_spec_met = 'SELECT sm.id as id, service_line, metric, year FROM specific_metrics sm, service_lines sl, metrics m WHERE sm.service_line_id=sl.id AND sm.metric_id=m.id';
         $result = $conn->query($sql_spec_met);
         if ($result) {
@@ -91,7 +90,6 @@ if ($_POST) {
                 echo '<option value="'.$row['id'].'">'.$row['service_line'].' - '.$row['metric'].' - '.$row['year'].'</option>';
             }
         }
-    
     ?>
     </select><br/>
     SL to Duplicate to:

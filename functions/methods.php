@@ -4,8 +4,7 @@ require_once('db.php');
 
 include('helpers.php');
 
-function getSpecificMetrics($service_line_id, $year, $provider_level)
-{
+function getSpecificMetrics($service_line_id, $year, $provider_level) {
     $sql = 'SELECT sm.id AS id, metric_id, metric, metric_def, is_calculated_metric, threshold_direction, is_gateway_metric, is_beta_metric, is_tbd_metric, weight, round_precision 
     from specific_metrics sm, metrics
     where sm.metric_id=metrics.id AND ';
@@ -42,16 +41,14 @@ function getSpecificMetrics($service_line_id, $year, $provider_level)
     return $specmet_array;
 }
 
-function getPerformancesByProvider($provider_id, $year, $period_performance=0)
-{
+function getPerformancesByProvider($provider_id, $year, $period_performance=0) {
     $fields = ['metric_id', 'quarter', 'sum(numerator) as numerator', 'sum(denominator) as denominator'];
     $where = ["provider_id=$provider_id", "year=$year", "period_performance=$period_performance"];
     $by = ['metric_id', 'quarter'];
     return sqlSelectQuery($fields, 'performances', $where, $by, $by);
 }
 
-function getPerformancesByServiceLine($service_line_id, $year, $period_performance=0)
-{
+function getPerformancesByServiceLine($service_line_id, $year, $period_performance=0) {
     $fields = ['metric_id', 'quarter', 'sum(numerator) as numerator', 'sum(denominator) as denominator'];
     $tables = 'performances, locations';
     $where = ['performances.location_id = locations.id', "locations.service_line_id=$service_line_id", "year=$year", "period_performance=$period_performance"];
@@ -59,18 +56,15 @@ function getPerformancesByServiceLine($service_line_id, $year, $period_performan
     return sqlSelectQuery($fields, $tables, $where, $by, $by);
 }
 
-function getServiceLineName($service_line_id)
-{
+function getServiceLineName($service_line_id) {
     return sqlSelectQuery(['service_line'],'service_lines',["id=$service_line_id"])[0]['service_line'];
 }
 
-function getServiceLines()
-{
+function getServiceLines() {
     return sqlSelectQuery(['id', 'service_line'],'service_lines',[],['service_line']);
 }
 
-function getYears()
-{
+function getYears() {
     $years_array =  sqlSelectQuery(['distinct year'],'specific_metrics');
     foreach ($years_array as $year) {
         $years[]=$year['year'];
@@ -78,8 +72,7 @@ function getYears()
     return $years;
 }
 
-function getCorrectThresholdValue($valarr, $performance, $direction)
-{
+function getCorrectThresholdValue($valarr, $performance, $direction) {
     $thresholds = array_keys($valarr);
     if ($direction == 0) {
         $thresholds1 = array_filter(
@@ -102,15 +95,13 @@ function getCorrectThresholdValue($valarr, $performance, $direction)
     }
 }
 
-function getProvidersByServiceLine(int $service_line_id) //Returns an array with each element having id, provider_name and badge_num
-{
+function getProvidersByServiceLine(int $service_line_id) { //Returns an array with each element having id, provider_name and badge_num
     $fields = ['id', 'provider_name', 'badge_num'];
     $where = ['provider_status=1', "service_line_id=$service_line_id"];
     return sqlSelectQuery($fields, 'providers', $where, ['provider_name']);
 }
 
-function getContract($provider_id)
-{
+function getContract($provider_id) {
     //$fields = ['total_incentive_amount as incentive', 'effective_quality_date as effective', 'default_expire_date as default_expire', 'inactive_date as inactive', 'pay_cycle_id'];
     //Need to test before converting to sqlSelectQuery, likely will need addtional manipulation based on the array being passed currently
     $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, inactive_date, pay_cycle_id 
@@ -319,7 +310,7 @@ function isServiceLinePeriodBased ($service_line_id) {
     return sqlSelectQuery(['is_period_based'],'service_lines',["id=$service_line_id"])[0]['is_period_based'];
 }
 
-function getMetricPerformanceArray ($performances, $specific_metric, $period_based = FALSE){
+function getMetricPerformanceArray ($performances, $specific_metric, $period_based = FALSE) {
     if (isset($specific_metric['round_precision'])){
         $precision = $specific_metric['round_precision'];
     } else {
@@ -349,12 +340,10 @@ function getMetricPerformanceArray ($performances, $specific_metric, $period_bas
     return $metric_perf;
 }
 
-function getProviderOverrides($provider_id)
-{
+function getProviderOverrides($provider_id) {
     return sqlSelectQuery(['id', 'time_frame', 'target_quarter', 'target_year'],'overrides',['override_type=1',"provider_id=$provider_id"]);
 }
 
-function getSpecificMetricOverrides($specific_metric_id)
-{
+function getSpecificMetricOverrides($specific_metric_id) {
     return sqlSelectQuery(['id','time_frame','target_quarter'],'overrides',['override_type=0',"specific_metric_id=$specific_metric_id"]);
 }
