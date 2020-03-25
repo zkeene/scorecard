@@ -51,7 +51,11 @@
 
         $performances = getPerformancesByProvider($provider['id'], $year_sel);
 
-        $period_performances = getPerformancesByProvider($provider['id'], $year_sel, 1);
+        if (isServiceLinePeriodBased($service_line_id)) {
+            $period_performances = getPerformancesByProvider($provider['id'], $year_sel, 1);
+        } else {
+            $period_performances = array();
+        }
 
         $no_data_metrics = getNoDataMetrics($specificmetrics, $performances, $quarter_sel);
         

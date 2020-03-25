@@ -109,7 +109,7 @@ function getContract($provider_id) {
         WHERE active=1 AND provider_id=$provider_id";
     global $conn;
     $result = $conn->query($sql);
-    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null, 'inactive'=>null);
+    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null, 'inactive'=>null, 'pay_cycle_id'=>null);
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $contract['incentive'] = $row['total_incentive_amount'];
