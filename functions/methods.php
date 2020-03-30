@@ -72,7 +72,7 @@ function getYears() {
     return $years;
 }
 
-function getCorrectThresholdValue($valarr, $performance, $direction) {
+function getCorrectThresholdValue(array $valarr, $performance, int $direction) {
     $thresholds = array_keys($valarr);
     if ($direction == 0) {
         $thresholds1 = array_filter(
@@ -298,7 +298,7 @@ function getNoDataMetrics ($specificmetrics, $performances, $quarter) {
     return $no_data_metrics;
 }
 
-function isServiceLinePeriodBased ($service_line_id) {
+function isServiceLinePeriodBased (int $service_line_id) {
     return sqlSelectQuery(['is_period_based'],'service_lines',["id=$service_line_id"])[0]['is_period_based'];
 }
 
@@ -332,10 +332,12 @@ function getMetricPerformanceArray ($performances, $specific_metric, $period_bas
     return $metric_perf;
 }
 
-function getProviderOverrides($provider_id) {
-    return sqlSelectQuery(['id', 'time_frame', 'target_quarter', 'target_year'],'overrides',['override_type=1',"provider_id=$provider_id"]);
+function getProviderOverrides(int $provider_id) {
+    $fields = ['id', 'time_frame', 'target_quarter', 'target_year'];
+    return sqlSelectQuery($fields,'overrides',['override_type=1',"provider_id=$provider_id"]);
 }
 
-function getSpecificMetricOverrides($specific_metric_id) {
-    return sqlSelectQuery(['id','time_frame','target_quarter'],'overrides',['override_type=0',"specific_metric_id=$specific_metric_id"]);
+function getSpecificMetricOverrides(int $specific_metric_id) {
+    $fields =  ['id','time_frame','target_quarter'];
+    return sqlSelectQuery($fields,'overrides',['override_type=0',"specific_metric_id=$specific_metric_id"]);
 }
