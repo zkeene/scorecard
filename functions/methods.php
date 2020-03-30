@@ -105,7 +105,11 @@ function getContract($provider_id) {
     $fields = ['total_incentive_amount','effective_quality_date','default_expire_date','inactive_date','pay_cycle_id'];
     $where = ['active=1',"provider_id=$provider_id"];
     $contracts = sqlSelectQuery($fields,'contracts',$where);
-    return $contracts[count($contracts)-1]; //return only the last contract
+    if ($contracts) {
+        return $contracts[count($contracts)-1]; //return only the last contract
+    } else {
+        return array('total_incentive_amount'=>null,'effective_quality_date'=>null,'default_expire_date'=>null,'inactive_date'=>null,'pay_cycle_id'=>null);
+    }
 }
 
 function getContracts(int $provider_id) {
