@@ -56,7 +56,7 @@ function getPerformancesByServiceLine($service_line_id, $year, $period_performan
     return sqlSelectQuery($fields, $tables, $where, $by, $by);
 }
 
-function getServiceLineName($service_line_id) {
+function getServiceLineName(int $service_line_id) {
     return sqlSelectQuery(['service_line'],'service_lines',["id=$service_line_id"])[0]['service_line'];
 }
 
@@ -102,24 +102,16 @@ function getProvidersByServiceLine(int $service_line_id) { //Returns an array wi
 }
 
 function getContract($provider_id) {
-    //$fields = ['total_incentive_amount as incentive', 'effective_quality_date as effective', 'default_expire_date as default_expire', 'inactive_date as inactive', 'pay_cycle_id'];
-    //Need to test before converting to sqlSelectQuery, likely will need addtional manipulation based on the array being passed currently
-    $sql = "SELECT total_incentive_amount, effective_quality_date, default_expire_date, inactive_date, pay_cycle_id 
-        FROM contracts 
-        WHERE active=1 AND provider_id=$provider_id";
-    global $conn;
-    $result = $conn->query($sql);
-    $contract = array('incentive'=>null, 'effective'=>null, 'default_expire'=>null, 'inactive'=>null, 'pay_cycle_id'=>null);
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $contract['incentive'] = $row['total_incentive_amount'];
-            $contract['effective'] = $row['effective_quality_date'];
-            $contract['default_expire'] = $row['default_expire_date'];
-            $contract['inactive'] = $row['inactive_date'];
-            $contract['pay_cycle_id'] = $row['pay_cycle_id'];
-        }
-    }
-    return $contract;
+    $fields = ['total_incentive_amount','effective_quality_date','default_expire_date','inactive_date','pay_cycle_id'];
+    $where = ['active=1',"provider_id=$provider_id"];
+    $contracts = sqlSelectQuery($fields,'contracts',$where);
+    return $contracts[count($contracts)-1]; //return only the last contract
+}
+
+function getContracts(int $provider_id) {
+    $fields = ['total_incentive_amount','effective_quality_date','default_expire_date','inactive_date','pay_cycle_id'];
+    $where = ['active=1',"provider_id=$provider_id"];
+    return sqlSelectQuery($fields,'contracts',$where);
 }
 
 function getContractStatusArray ($effective_str, $default_expire_str, $inactive_str, $year_sel) {

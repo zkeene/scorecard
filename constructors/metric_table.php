@@ -34,7 +34,7 @@
                 echo '</tr>';
             }
         }
-        if (($contract['incentive'] != 0) && (!$specificmetrics[$i]['is_beta_metric'])) {
+        if (($contract['total_incentive_amount'] != 0) && (!$specificmetrics[$i]['is_beta_metric'])) {
             echo '<tr>';
             for ($j=1; $j <= 4; $j++) {
                 if (($j<count($metric_perf)+1) && ($j <=$quarter_sel)) {

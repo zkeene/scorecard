@@ -39,15 +39,15 @@
     foreach ($providers as $provider) {
 
         $contract = getContract($provider['id']);
-        if ($contract['incentive']) {
-            $qtr_incentive = $contract['incentive']/4;
+        if ($contract['total_incentive_amount']) {
+            $qtr_incentive = $contract['total_incentive_amount']/4;
         } else {
             $qtr_incentive = 0;
         }
 
         $qtr_incentive_per_metric = ($incentive_metric_count > 0 ? ($qtr_incentive/$incentive_metric_count):0);
 
-        $quarter_status = getContractStatusArray($contract['effective'],$contract['default_expire'],$contract['inactive'],$year_sel);
+        $quarter_status = getContractStatusArray($contract['effective_quality_date'],$contract['default_expire_date'],$contract['inactive_date'],$year_sel);
 
         $performances = getPerformancesByProvider($provider['id'], $year_sel);
 
@@ -185,7 +185,7 @@
                                 } elseif ($quarter_status[$m]=='ineligible') {
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
-                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $contract['inactive'], $year_sel);
+                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective_quality_date'], $contract['default_expire_date'], $contract['inactive_date'], $year_sel);
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
@@ -201,7 +201,7 @@
                                 } elseif ($quarter_status[$m]=='ineligible') {
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
-                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective'], $contract['default_expire'], $contract['inactive'], $year_sel);
+                                    $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective_quality_date'], $contract['default_expire_date'], $contract['inactive_date'], $year_sel);
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']));
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
@@ -249,11 +249,11 @@
             } ?>
         <?php        
         if (!($page+1 < ($metriccount/(2*$metrics_per_row)))){
-            if (($contract['incentive'] != 0) && ($contract['pay_cycle_id']==2)) {
+            if (($contract['total_incentive_amount'] != 0) && ($contract['pay_cycle_id']==2)) {
                 echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
                 $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive, 'status'=>$quarter_status[$quarter_sel]);
             }
-            if (($contract['incentive'] != 0) && ($contract['pay_cycle_id']==3) && ($quarter_sel == 4)) {
+            if (($contract['total_incentive_amount'] != 0) && ($contract['pay_cycle_id']==3) && ($quarter_sel == 4)) {
                 echo '<div class="incentive">Total Quality Incentive: '.curr_format($total_incentive).'</div>';
                 $comp_report[] = array('provider_name'=>$provider['provider_name'],'badge_num'=>$provider['badge_num'],'incentive'=>$total_incentive, 'status'=>$quarter_status[$quarter_sel]);
             }
