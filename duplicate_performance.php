@@ -11,7 +11,7 @@ global $conn;
 <?php
 $sql = 'select distinct provider_name
 from performances, providers
-where performances.provider_id = providers.id and (year>2020 or (quarter>2 and year=2019))
+where performances.provider_id = providers.id and year>2019
 group by provider_id, metric_id, quarter, year
 HAVING count(provider_id) >1 AND count(metric_id) >1 AND count(quarter) >1 AND count(year) >1';
 ?>
