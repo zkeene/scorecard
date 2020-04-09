@@ -249,7 +249,7 @@ function getPartialQuarterPercent ($quarter, $effective_str, $default_expire_str
 function getGatewayStatus ($specificmetrics, $performances) {
     $gateway_status = array_fill(1,4,1);
     $gateway_key = array_search(1,array_column($specificmetrics,'is_gateway_metric'));
-    if ($gateway_key!="") {
+    if (is_numeric($gateway_key)) {
         $gateway_metric_id = $specificmetrics[$gateway_key]['metric_id'];
         $gateway_threshold_key = array_search(1, array_column($specificmetrics[$gateway_key]['thresholds'], 'is_gateway_threshold', 'id'));
         $gateway_threshold = $specificmetrics[$gateway_key]['thresholds'][$gateway_threshold_key]['threshold'];
