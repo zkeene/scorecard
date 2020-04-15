@@ -62,7 +62,7 @@
         $gateway_status = getGatewayStatus($specificmetrics, $performances);
 
         foreach($quarter_status as $qtr => $qtr_status) {
-            if ($gateway_status[$qtr]==0) {
+            if ($gateway_status[$qtr]==0 && $quarter_status[$qtr]=='eligible') {
                 $quarter_status[$qtr] = 'ineligible';
             }
         }
@@ -186,6 +186,9 @@
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
                                     $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective_quality_date'], $contract['default_expire_date'], $contract['inactive_date'], $year_sel);
+                                    if($gateway_status[$m]==0) {
+                                        $partial_quarter_percent['eligible']=0;
+                                    }
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + $partial_qtr_percent['eligible'];
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
@@ -202,6 +205,9 @@
                                     $percent_incentive[$m]=0;
                                 } elseif ($quarter_status[$m]=='partial') {
                                     $partial_qtr_percent = getPartialQuarterPercent($m, $contract['effective_quality_date'], $contract['default_expire_date'], $contract['inactive_date'], $year_sel);
+                                    if($gateway_status[$m]==0) {
+                                        $partial_quarter_percent['eligible']=0;
+                                    }
                                     $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']));
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
