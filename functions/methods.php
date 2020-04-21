@@ -140,7 +140,7 @@ function getContractStatusArray ($effective_str, $default_expire_str, $inactive_
 
     //year date evaluations
     $effective_before_year_start = $effective <= $year_start;
-    $default_expire_before_year_start = $default_expire < $year_start;
+    $default_expire_before_year_start = $default_expire < $year_start && !$default_is_null;
     $not_inactive_in_year = ($inactive > $year_end) || $inactive_is_null;
     $default_expire_after_year_end = ($default_expire >= $year_end) || $default_is_null;
     $effective_after_year_end = ($effective > $year_end) || $effective_is_null;
@@ -167,7 +167,7 @@ function getContractStatusArray ($effective_str, $default_expire_str, $inactive_
 
             //quarter date evaluations
             $effective_before_qtr_start = $effective <= $quarter_start[$m];
-            $default_expire_before_qtr_start = $default_expire < $quarter_start[$m];
+            $default_expire_before_qtr_start = $default_expire < $quarter_start[$m] && !$default_is_null;
             $not_inactive_in_qtr = ($inactive > $quarter_end[$m]) || $inactive_is_null;
             $default_expire_after_qtr_end = ($default_expire >= $quarter_end[$m]) || $default_is_null;
             $effective_after_qtr_end = $effective > $quarter_end[$m] || $effective_is_null;
