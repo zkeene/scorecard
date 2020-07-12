@@ -102,7 +102,11 @@
                     
                     $metric_perf = getMetricPerformanceArray($performances,$specific_metric);
                     
-                    $period_metric_perf = getMetricPerformanceArray($period_performances,$specific_metric, TRUE);
+                    if (isServiceLinePeriodBased($service_line_id)) {
+                        $period_metric_perf = getMetricPerformanceArray($period_performances,$specific_metric, TRUE);
+                    } else {
+                        $period_metric_perf = array();
+                    }
                     
                     //color array
                     if (array_key_exists('thresholds', $specific_metric)) {
