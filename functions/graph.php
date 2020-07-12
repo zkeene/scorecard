@@ -10,7 +10,7 @@ function scaleValue ($value, $barheight, $min_value, $max_value) {
 
 //$p: array(quarter=>performance)
 //$d: direction(0=>up,1=>down)
-//$c: array(threshold=>hex_color)
+//$c: array(threshold=>hex_color) what is the newly expected data structure??
 //$q: run graph to this quarter
 //$x: array(period=>performance)
 //$f: floating goal boolean
@@ -38,7 +38,7 @@ function createGraph(array $p, int $d, array $c, int $q, array $x=[], int $f=0)
     //filter the original threshold/color array to remove 0 and 100 thresholds based on direction
     $thresharr = array();
     if ($f==1) {
-        foreach ($c as $qtr => $qtr_threshold) {
+        foreach ($c as $qtr => $qtr_threshold) { //This fails if not all quarters have thresholds, should eventually rewrite to use last thresholds if missing
             foreach ($qtr_threshold as $threshold => $color) {
                 if (($d==0 && $threshold!=0) || ($d==1 && $threshold!=100)) {
                     $thresharr[$qtr][] = array($threshold,$color);
