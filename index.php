@@ -12,7 +12,7 @@
             include('functions/methods.php');
             include('functions/graph.php');
             include('constructors/selector.php');
-
+            
     $metrics_per_row = 2;
 
     $specificmetrics = getSpecificMetrics($service_line_id, $year_sel, TRUE);
@@ -110,7 +110,14 @@
                     
                     //color array
                     if (array_key_exists('thresholds', $specific_metric)) {
-                        $colors = array_column($specific_metric['thresholds'], 'color_hex', 'threshold');
+                        if (getNumOfThresholdQuarters($specific_metric['id'])>1){
+                            $colors = array();
+                            foreach ($specific_metric['thresholds'] as $threshold) {
+                                $colors[$threshold['quarter']][$threshold['threshold']] = $threshold['color_hex'];
+                            }
+                        } else {
+                            $colors = array_column($specific_metric['thresholds'], 'color_hex', 'threshold');
+                        }
                     } else {
                         if (!$specific_metric['threshold_direction']) {
                             $colors = array(0=>'#4488ff');
@@ -131,10 +138,15 @@
 
                     if (!$specific_metric['is_tbd_metric']) {
                         echo '<div class="metric_graph">';
-                        if (isServiceLinePeriodBased($service_line_id)) {
-                            createGraph($perfarr, $specific_metric['threshold_direction'], $colors, $quarter_sel, $period_perfarr);
+                        if (getNumOfThresholdQuarters($specific_metric['id'])>1) {
+                            $floating_threshold = 1;
                         } else {
-                            createGraph($perfarr, $specific_metric['threshold_direction'], $colors, $quarter_sel);
+                            $floating_threshold = 0;
+                        }
+                        if (isServiceLinePeriodBased($service_line_id)) {
+                            createGraph($perfarr, $specific_metric['threshold_direction'], $colors, $quarter_sel, $period_perfarr, $floating_threshold);
+                        } else {
+                            createGraph($perfarr, $specific_metric['threshold_direction'], $colors, $quarter_sel, array(), $floating_threshold);
                         }
                         echo "</div>\n";
                     }
@@ -146,7 +158,14 @@
                     $specific_metric_overrides = getSpecificMetricOverrides($specific_metric['id']);
 
                     if (array_key_exists('thresholds', $specific_metric)) {
-                        $thresh_percent_arr = array_column($specific_metric['thresholds'], 'threshold_incentive_percent', 'threshold');
+                        if (getNumOfThresholdQuarters($specific_metric['id'])==0) {
+                            $thresh_percent_arr = array_column($specific_metric['thresholds'], 'threshold_incentive_percent', 'threshold');
+                        } else {
+                            $thresh_percent_arr = array();
+                            foreach ($specific_metric['thresholds'] as $threshold) {
+                                $thresh_percent_arr[$threshold['quarter']][$threshold['threshold']] = $threshold['threshold_incentive_percent'];
+                            }
+                        }
                     } else {
                         if (!$specific_metric['threshold_direction']) {
                             $thresh_percent_arr = array(0=>100);
@@ -198,8 +217,12 @@
                                 }
                             } else {
                                 if ($quarter_status[$m]=='eligible') {
-                                    if ($m<count($metric_perf)+1) {
-                                        $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']);
+                                    if ($m<count($metric_perf)+1) { //this will need fixed to eval if it is a floating threshold and specify the qtr to send to getCorrectThreshold
+                                        if (getNumOfThresholdQuarters($specific_metric['id'])==0) {
+                                            $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']);
+                                        } else {
+                                            $percent_incentive[$m] = getCorrectThresholdValue($thresh_percent_arr[$m], $perfarr[$m], $specific_metric['threshold_direction']);
+                                        }
                                         $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                     }
                                 } elseif ($quarter_status[$m]=='default') {
@@ -212,7 +235,11 @@
                                     if($gateway_status[$m]==0) {
                                         $partial_quarter_percent['eligible']=0;
                                     }
-                                    $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']));
+                                    if (getNumOfThresholdQuarters($specific_metric['id'])==0) {
+                                        $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr, $perfarr[$m], $specific_metric['threshold_direction']));
+                                    } else {
+                                        $percent_incentive[$m] = $partial_qtr_percent['default'] + ($partial_qtr_percent['eligible']/100*getCorrectThresholdValue($thresh_percent_arr[$m], $perfarr[$m], $specific_metric['threshold_direction']));
+                                    }
                                     $inc_array[$m] = $percent_incentive[$m]/100*$qtr_incentive_per_metric*$metric_weight;
                                 }
                             }
