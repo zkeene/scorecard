@@ -24,7 +24,7 @@ function getSpecificMetrics($service_line_id, $year, $provider_level) {
             $specmet_array[$arrid]=$row;
 
             $sql1 = '
-        SELECT smt.id as id, threshold, threshold_incentive_percent, message, color_hex, is_gateway_threshold
+        SELECT smt.id as id, threshold, threshold_incentive_percent, message, color_hex, is_gateway_threshold, quarter
         from specific_metric_thresholds smt, threshold_colors colors, messages
         where smt.threshold_color_id=colors.id and smt.message_id=messages.id and specific_metric_id='.$row['id'];
 
@@ -307,7 +307,12 @@ function isServiceLinePeriodBased (int $service_line_id) {
     return sqlSelectQuery(['is_period_based'],'service_lines',["id=$service_line_id"])[0]['is_period_based'];
 }
 
-function getMetricPerformanceArray ($performances, $specific_metric, $period_based = FALSE) {
+function getNumOfThresholdQuarters (int $specific_metric_id) {
+    $fields = ['count(distinct quarter) as num_quarters'];
+    return sqlSelectQuery($fields,'specific_metric_thresholds',["specific_metric_id=$specific_metric_id"])[0]['num_quarters'];
+}
+
+function getMetricPerformanceArray (array $performances,array $specific_metric, $period_based = FALSE) {
     if (isset($specific_metric['round_precision'])){
         $precision = $specific_metric['round_precision'];
     } else {
