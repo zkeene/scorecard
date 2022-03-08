@@ -95,6 +95,9 @@
                     $specific_metric = $specificmetrics[$i];
                     echo '<div class="metric">
                         <div class="metric_title">';
+                    if ($specific_metric['is_beta_metric']){
+                        echo 'Beta:';
+                    }
                     echo $specific_metric['metric'];
                     echo "</div>\n";
 
